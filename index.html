@@ -1,0 +1,1519 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El Rosco Argentino</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --stage:#0B2240; --stage2:#123158; --navy:#0E2A47; --paper:#F4F8FC;
+    --celeste:#6CB7E8; --celeste-deep:#3F8FC6; --sun:#F6C544; --sun-deep:#E0A91F;
+    --line:#D6E4F0; --line-dark:#28466e; --muted:#5E7894; --muted-l:#9FB8D4;
+    --good:#2BB673; --bad:#E2493B;
+    --shadow:0 10px 30px rgba(4,16,33,.35); --shadow-sm:0 3px 12px rgba(14,42,71,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--navy);min-height:100dvh;
+    background:radial-gradient(1100px 500px at 50% -8%,rgba(108,183,232,.30),transparent 60%),var(--paper);
+    -webkit-font-smoothing:antialiased;}
+  body.stage-mode{background:radial-gradient(900px 600px at 50% 0%,#1a3f6e 0%,var(--stage) 62%);color:#fff}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 40px;min-height:100dvh;display:flex;flex-direction:column}
+  .screen{display:none;animation:fade .3s ease both}
+  .screen.active{display:flex;flex-direction:column;flex:1}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .brand{text-align:center;margin:12px 0 6px}
+  .brand h1{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(38px,11vw,72px);line-height:.94;margin:0;text-transform:uppercase}
+  .brand h1 .el{color:var(--celeste-deep)} .brand h1 .ro{color:var(--sun-deep)}
+  body.stage-mode .brand h1 .el{color:var(--celeste)} body.stage-mode .brand h1 .ro{color:var(--sun)}
+  .kick{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  body.stage-mode .kick{color:var(--muted-l)}
+  .tagline{color:var(--muted);max-width:42ch;margin:6px auto 0;font-size:15px}
+
+  .btn{appearance:none;border:0;cursor:pointer;font-family:inherit;font-weight:700;border-radius:16px;padding:15px 20px;font-size:17px;width:100%;transition:transform .08s,background .2s}
+  .btn:active{transform:translateY(1px)} .btn:disabled{opacity:.4;cursor:default}
+  .btn-primary{background:var(--navy);color:#fff;box-shadow:var(--shadow-sm)}
+  .btn-sun{background:var(--sun);color:var(--navy);box-shadow:var(--shadow-sm)} .btn-sun:hover:not(:disabled){background:var(--sun-deep)}
+  .btn-ghost{background:transparent;color:var(--navy);border:2px solid var(--line)}
+  body.stage-mode .btn-ghost{color:#fff;border-color:var(--line-dark)}
+  .stack{display:flex;flex-direction:column;gap:11px;margin-top:auto}
+  .center{margin:auto 0}
+  .row{display:flex;gap:11px} .row .btn{flex:1}
+  .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow-sm)}
+  .section-title{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;font-size:23px;margin:0 0 4px}
+  .hint{color:var(--muted);font-size:14px;margin:0 0 14px}
+  .lbl{display:block;font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 7px}
+  input{font-family:inherit;font-size:16px;width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:13px;outline:none;font-weight:600}
+  input:focus{border-color:var(--celeste-deep)}
+  .opts-seg{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:9px 15px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted)}
+  .chip.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .config-warn{background:#FBE7E6;border:1.5px solid var(--bad);color:#8a211d;border-radius:14px;padding:13px 15px;font-size:14px;margin-bottom:14px;line-height:1.5}
+  code{background:#eef3f8;padding:2px 6px;border-radius:6px;font-size:13px}
+
+  /* bracket */
+  .match-card{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+  .match-card .mlabel{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--celeste-deep);margin-bottom:8px}
+  .match-card .vs{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
+  .match-card .vs .tn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .match-card .vs .vsx{font-family:'Anton',sans-serif;color:var(--sun-deep);font-size:15px}
+  .match-card .winner{color:var(--good)}
+  .match-card .btn{margin-top:12px;padding:11px}
+  .live-pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;font-weight:700;font-size:13px;color:var(--navy);box-shadow:var(--shadow-sm);max-width:100%;flex-wrap:wrap;justify-content:center}
+  .live-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--bad);animation:pulse 1.3s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* match (escenario) */
+  .scorestrip{display:flex;gap:8px;margin-bottom:6px}
+  .sidechip{flex:1;display:flex;align-items:center;gap:8px;background:#10325a;border:1.5px solid var(--line-dark);border-radius:14px;padding:9px 12px;font-size:13.5px;font-weight:700;color:var(--muted-l);min-width:0}
+  .sidechip.on{border-color:var(--sun);background:#163b61;color:#fff;box-shadow:0 0 0 2px rgba(246,197,68,.25)}
+  .sidechip .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sidechip .g{color:var(--good)} .sidechip .b{color:var(--bad)}
+  .sidechip .tm{font-family:'Anton',sans-serif;font-size:17px;color:var(--sun)}
+  .clockwarn .tm{color:var(--bad)!important}
+  .ringbox{display:flex;justify-content:center;margin:2px 0}
+  .ringbox svg{width:min(82vw,340px);height:auto}
+  .rl text{font-family:'Anton',sans-serif;font-size:17px;fill:#fff}
+  .rl circle{stroke-width:2}
+  .rl.pend circle{fill:#15396a;stroke:#2c5a8a}
+  .rl.pass circle{fill:#15396a;stroke:var(--sun)} .rl.pass text{fill:var(--sun)}
+  .rl.ok circle{fill:var(--good);stroke:#1d8a55}
+  .rl.bad circle{fill:var(--bad);stroke:#b22d27}
+  .rl.cur circle{fill:var(--sun);stroke:var(--sun-deep)} .rl.cur text{fill:var(--navy)}
+  .rl{transform-box:fill-box;transform-origin:center}
+  .rl.cur{animation:beat 1s ease-in-out infinite}
+  @keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+  .cluecard{background:#fff;color:var(--navy);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);margin-top:6px}
+  .cluecard .top{display:flex;align-items:center;gap:12px}
+  .bigletter{font-family:'Anton',sans-serif;font-size:38px;background:var(--sun);color:var(--navy);width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .cmode{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--celeste-deep)}
+  .ctext{font-size:16.5px;font-weight:600;line-height:1.32;margin-top:2px}
+  .cans{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);font-size:13px;color:var(--muted)}
+  .cans b{color:var(--navy);letter-spacing:.04em}
+  .judges{display:flex;gap:9px;margin-top:11px}
+  .judge{flex:1;border:0;border-radius:16px;padding:16px 6px;font-family:inherit;font-weight:800;font-size:15px;color:#fff;cursor:pointer;transition:transform .08s}
+  .judge:active{transform:scale(.97)} .judge:disabled{opacity:.4}
+  .j-ok{background:var(--good)} .j-bad{background:var(--bad)} .j-pass{background:var(--celeste-deep)}
+  .matchctl{display:flex;gap:9px;margin-top:9px}
+  .matchctl .btn{padding:11px;font-size:14px}
+
+  /* resultado / campeón */
+  .res-row{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px;color:var(--navy)}
+  .res-row.win{border-color:var(--sun-deep);background:linear-gradient(0deg,#fff,#fffaf0)}
+  .res-row .nm{font-weight:800;flex:1}
+  .res-row .nums{font-family:'Anton',sans-serif;font-size:18px}
+  .champ{font-family:'Anton',sans-serif;font-size:clamp(34px,10vw,60px);text-transform:uppercase;text-align:center;color:var(--sun);text-shadow:0 4px 24px rgba(246,197,68,.35)}
+
+  /* espectador */
+  .spec-grid{display:flex;flex-direction:column;gap:12px}
+  .spec-side{background:#10325a;border:1.5px solid var(--line-dark);border-radius:18px;padding:12px}
+  .spec-side.on{border-color:var(--sun)}
+  .spec-side .hd{display:flex;align-items:center;gap:8px;font-weight:800;margin-bottom:6px}
+  .spec-side .hd .tm{margin-left:auto;font-family:'Anton',sans-serif;color:var(--sun);font-size:20px}
+  .spec-side svg{width:100%;height:auto;max-width:300px;display:block;margin:0 auto}
+  .spec-clue{background:#fff;color:var(--navy);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow)}
+  #pinInput{letter-spacing:.4em;text-transform:uppercase;font-family:'Anton',sans-serif;font-size:28px;text-align:center}
+  .footer-note{text-align:center;color:var(--muted);font-size:12.5px;margin-top:14px}
+  body.stage-mode .footer-note{color:var(--muted-l)}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HOME -->
+  <section id="s-home" class="screen active">
+    <div class="brand center">
+      <div class="kick">Pasapalabra criollo · por equipos</div>
+      <h1><span class="el">EL ROSCO</span><br><span class="ro">ARGENTINO</span></h1>
+      <p class="tagline">De 2 a 8 equipos en eliminación directa. Cada equipo con su propio rosco de 25 letras y su reloj. El moderador lee, el equipo canta la respuesta.</p>
+    </div>
+    <div class="stack">
+      <button class="btn btn-sun" onclick="goSetup()">Soy el moderador · armar torneo</button>
+      <button class="btn btn-ghost" onclick="goSpec()">Ver en vivo (espectador)</button>
+    </div>
+    <p class="footer-note">Banco de 800 palabras · roscos al azar · hasta 12 equipos</p>
+  </section>
+
+  <!-- SETUP -->
+  <section id="s-setup" class="screen">
+    <div class="brand"><h1 style="font-size:clamp(30px,8vw,46px)">El torneo</h1></div>
+    <div id="cfgWarn"></div>
+    <div class="card">
+      <h2 class="section-title">Los equipos</h2>
+      <label class="lbl" style="margin-top:0">¿Cuántos equipos juegan?</label>
+      <div class="opts-seg" id="countOpts"></div>
+      <p class="hint" id="countHint" style="margin:10px 0 0"></p>
+      <div id="teamInputs" style="margin-top:6px"></div>
+      <label class="lbl">Tiempo por rosco (cada equipo)</label>
+      <div class="opts-seg" id="timeOpts"></div>
+    </div>
+    <div class="row" style="margin-top:13px">
+      <button class="btn btn-ghost" onclick="show('s-home')">Volver</button>
+      <button class="btn btn-sun" onclick="createTournament()">Crear torneo</button>
+    </div>
+  </section>
+
+  <!-- LLAVE -->
+  <section id="s-bracket" class="screen">
+    <div class="brand"><div class="kick">Cuadro del torneo</div><h1 style="font-size:clamp(28px,8vw,44px)">Llave</h1></div>
+    <div id="livePill" style="text-align:center;margin-bottom:12px"></div>
+    <div id="bracket"></div>
+    <div class="stack">
+      <button class="btn btn-ghost" onclick="confirmResetT()">Reiniciar torneo</button>
+    </div>
+  </section>
+
+  <!-- PARTIDO (moderador) -->
+  <section id="s-match" class="screen">
+    <div class="kick" id="mLabel" style="text-align:center;margin-bottom:7px">Semifinal</div>
+    <div class="scorestrip" id="scorestrip"></div>
+    <div class="ringbox"><svg id="ring" viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg"></svg></div>
+    <div class="cluecard">
+      <div class="top">
+        <div class="bigletter" id="cLetter">A</div>
+        <div style="min-width:0">
+          <div class="cmode" id="cMode">Empieza con A</div>
+          <div class="ctext" id="cText">—</div>
+        </div>
+      </div>
+      <div class="cans">Respuesta (solo moderador): <b id="cAns">—</b></div>
+      <div class="judges">
+        <button class="judge j-ok" onclick="judge('ok')">✔ Correcta</button>
+        <button class="judge j-pass" onclick="judge('pass')">⟳ Pasa</button>
+        <button class="judge j-bad" onclick="judge('bad')">✖ Error</button>
+      </div>
+    </div>
+    <div class="matchctl">
+      <button class="btn btn-ghost" id="pauseBtn" onclick="togglePause()">⏸ Pausar</button>
+      <button class="btn btn-ghost" onclick="backToBracket()">Llave</button>
+    </div>
+  </section>
+
+  <!-- FIN DE PARTIDO -->
+  <section id="s-matchend" class="screen">
+    <div class="brand"><div class="kick" id="meLabel">Resultado</div><h1 style="font-size:clamp(28px,8vw,46px)" id="meTitle">—</h1></div>
+    <div id="meRows" style="margin-top:8px"></div>
+    <div id="tiebreak" style="display:none">
+      <div class="cluecard" style="margin-top:6px">
+        <div class="top">
+          <div class="bigletter" style="font-size:26px">⚡</div>
+          <div style="min-width:0">
+            <div class="cmode">Muerte súbita · gana el primero que la canta</div>
+            <div class="ctext" id="tbClue">—</div>
+          </div>
+        </div>
+        <div class="cans">Respuesta (solo moderador): <b id="tbAns">—</b></div>
+        <div class="judges">
+          <button class="judge j-ok" id="tbA" onclick="tieWin(0)">Ganó A</button>
+          <button class="judge j-ok" id="tbB" onclick="tieWin(1)">Ganó B</button>
+          <button class="judge j-pass" onclick="nextTiebreak()">⟳ Otra palabra</button>
+        </div>
+      </div>
+    </div>
+    <div class="stack"><button class="btn btn-sun" id="contBtn" onclick="contAfterMatch()">Seguir con el torneo</button></div>
+  </section>
+
+  <!-- CAMPEÓN -->
+  <section id="s-champion" class="screen">
+    <div class="center" style="text-align:center">
+      <div class="kick">Campeón del Rosco Argentino</div>
+      <div style="font-size:64px;margin:10px 0">🏆</div>
+      <div class="champ" id="champName">—</div>
+    </div>
+    <div class="stack"><button class="btn btn-ghost" onclick="confirmResetT()">Nuevo torneo</button></div>
+  </section>
+
+  <!-- ESPECTADOR: ENTRAR -->
+  <section id="s-specjoin" class="screen">
+    <div class="brand"><h1 style="font-size:clamp(30px,8vw,46px)">Ver en vivo</h1></div>
+    <div class="card center">
+      <label class="lbl" style="margin-top:0">PIN de la transmisión</label>
+      <input id="pinInput" maxlength="4" placeholder="PIN" autocomplete="off" autocapitalize="characters">
+      <button class="btn btn-sun" style="margin-top:16px" onclick="joinSpec()">Entrar a mirar</button>
+      <p class="hint" id="specErr" style="color:var(--bad);text-align:center;margin:12px 0 0;display:none"></p>
+    </div>
+    <div class="stack"><button class="btn btn-ghost" onclick="show('s-home')">Volver</button></div>
+  </section>
+
+  <!-- ESPECTADOR: VISTA -->
+  <section id="s-spec" class="screen">
+    <div class="kick" id="spLabel" style="text-align:center;margin-bottom:8px">—</div>
+    <div class="spec-clue" id="spClue" style="margin-bottom:12px">Esperando la transmisión…</div>
+    <div class="spec-grid" id="spGrid"></div>
+    <div class="stack"><button class="btn btn-ghost" onclick="leaveSpec()">Salir</button></div>
+  </section>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+/* =====================================================================
+   Pegá acá LA MISMA config de Firebase que usaste en argentrivia-en-vivo
+   (sirve el mismo proyecto). Con eso se habilita el modo espectador.
+   El juego del moderador funciona igual aunque esto quede sin completar.
+   ===================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyC45WavH9IMaGH9MM2iF7YbeccixUaCrTU",
+  authDomain: "argentrivia-6d57b.firebaseapp.com",
+  databaseURL: "https://argentrivia-6d57b-default-rtdb.firebaseio.com",
+  projectId: "argentrivia-6d57b",
+  storageBucket: "argentrivia-6d57b.firebasestorage.app",
+  messagingSenderId: "477985487583",
+  appId: "1:477985487583:web:604fd98b12e24b0fdf876a",
+  measurementId: "G-V8NEVNTRSY"
+};
+
+/* ---------- letras y roscos ---------- */
+const LETTERS=['A','B','C','D','E','F','G','H','I','J','L','M','N','Ñ','O','P','Q','R','S','T','U','V','X','Y','Z'];
+/* m:'E' = empieza con · m:'C' = contiene la */
+const ROSCOS=[
+{name:'Semifinal 1 · Rosco celeste',w:[
+ {m:'E',ans:'ASADO',clue:'Comida argentina a las brasas por excelencia',d:1},
+ {m:'E',ans:'BANDONEÓN',clue:'Instrumento esencial del tango',d:2},
+ {m:'E',ans:'CABILDO',clue:'Edificio colonial frente a la Plaza de Mayo',d:2},
+ {m:'E',ans:'DULCE',clue:'El de leche es el más argentino de todos',d:1},
+ {m:'E',ans:'EMPANADA',clue:'Comida típica rellena; puede ser salteña o tucumana',d:1},
+ {m:'E',ans:'FORTÍN',clue:'Puesto militar de frontera en la pampa del siglo XIX',d:3},
+ {m:'E',ans:'GUALEGUAYCHÚ',clue:'Ciudad entrerriana famosa por su carnaval',d:2},
+ {m:'E',ans:'HORMIGA',clue:'Insecto social que vive en colonias y carga hojas',d:1},
+ {m:'E',ans:'IGUAZÚ',clue:'Cataratas misioneras, maravilla natural del mundo',d:1},
+ {m:'E',ans:'JACARANDÁ',clue:'Árbol que tiñe de violeta Buenos Aires en noviembre',d:2},
+ {m:'E',ans:'LOCRO',clue:'Guiso criollo que se come cada 25 de Mayo',d:1},
+ {m:'E',ans:'MAFALDA',clue:'Niña de historieta creada por Quino',d:1},
+ {m:'E',ans:'NEUQUÉN',clue:'Provincia patagónica cuya capital lleva el mismo nombre',d:1},
+ {m:'C',ans:'CAÑO',clue:'Jugada futbolera: pasar la pelota entre las piernas del rival',d:1},
+ {m:'E',ans:'OBELISCO',clue:'Monumento porteño inaugurado en 1936',d:1},
+ {m:'E',ans:'PAMPA',clue:'Llanura extensa del centro del país',d:1},
+ {m:'E',ans:'QUEBRACHO',clue:'Árbol de madera durísima; su nombre viene de quebrar el hacha',d:3},
+ {m:'E',ans:'RAYUELA',clue:'Novela de Cortázar y también juego infantil de saltar casilleros',d:2},
+ {m:'E',ans:'SÁNGUCHE',clue:'El de miga es infaltable en los cumpleaños',d:1},
+ {m:'E',ans:'TANGO',clue:'Baile rioplatense declarado patrimonio de la humanidad',d:1},
+ {m:'E',ans:'UVA',clue:'Fruta con la que se elabora el vino',d:1},
+ {m:'E',ans:'VENDIMIA',clue:'Fiesta mendocina de la cosecha',d:2},
+ {m:'C',ans:'ÉXODO',clue:'El Jujeño fue la retirada ordenada por Belgrano en 1812',d:3},
+ {m:'E',ans:'YAPA',clue:'Lo que el vendedor te da de regalo, de más',d:1},
+ {m:'E',ans:'ZONDA',clue:'Viento cálido y seco típico de Cuyo',d:2},
+]},
+{name:'Semifinal 1 · Rosco dorado',w:[
+ {m:'E',ans:'ALFAJOR',clue:'Golosina de dos tapas unidas con dulce de leche',d:1},
+ {m:'E',ans:'BOMBILLA',clue:'Con ella se sorbe el mate',d:1},
+ {m:'E',ans:'CORDILLERA',clue:'Cadena montañosa como la de los Andes',d:1},
+ {m:'E',ans:'DIQUE',clue:'Obra que embalsa un río para guardar agua',d:2},
+ {m:'E',ans:'ESCARAPELA',clue:'Distintivo celeste y blanco que se luce en las fechas patrias',d:2},
+ {m:'E',ans:'FACÓN',clue:'Cuchillo grande que el gaucho lleva a la cintura',d:2},
+ {m:'E',ans:'GLACIAR',clue:'Masa de hielo como el Perito Moreno',d:1},
+ {m:'E',ans:'HIMNO',clue:'Canción patria que se entona antes de los partidos',d:1},
+ {m:'E',ans:'INFLACIÓN',clue:'Suba generalizada y sostenida de los precios',d:1},
+ {m:'E',ans:'JINETEADA',clue:'Destreza criolla de montar un caballo reservado',d:3},
+ {m:'E',ans:'LAGUNA',clue:'Espejo de agua menor que un lago; también un olvido',d:1},
+ {m:'E',ans:'MILANESA',clue:'Filete empanado y frito; puede ser a la napolitana',d:1},
+ {m:'E',ans:'NAFTA',clue:'Combustible que cargan los autos',d:1},
+ {m:'E',ans:'ÑOQUIS',clue:'Pasta que se come el 29 de cada mes con plata bajo el plato',d:2},
+ {m:'E',ans:'OMBÚ',clue:'Árbol de sombra generosa, símbolo de la pampa',d:3},
+ {m:'E',ans:'PAYADA',clue:'Canto improvisado con guitarra, en contrapunto entre gauchos',d:3},
+ {m:'E',ans:'QUILMES',clue:'Ciudad bonaerense, cerveza y pueblo originario calchaquí',d:2},
+ {m:'E',ans:'RECOLETA',clue:'Barrio porteño famoso por su cementerio',d:2},
+ {m:'E',ans:'SUBMARINO',clue:'Leche caliente con una barrita de chocolate adentro',d:2},
+ {m:'E',ans:'TERMO',clue:'Recipiente que mantiene caliente el agua del mate',d:1},
+ {m:'E',ans:'URNA',clue:'Caja donde se deposita el voto',d:1},
+ {m:'E',ans:'VIZCACHA',clue:'Roedor pampeano; un personaje del Martín Fierro lleva su nombre',d:3},
+ {m:'C',ans:'BOXEO',clue:'Deporte de Carlos Monzón y Nicolino Locche',d:1},
+ {m:'E',ans:'YERBA',clue:'Sin ella no hay mate',d:1},
+ {m:'E',ans:'ZAMBA',clue:'Danza folclórica que se baila revoleando el pañuelo',d:1},
+]},
+{name:'Semifinal 2 · Rosco celeste',w:[
+ {m:'E',ans:'AGUINALDO',clue:'Sueldo anual complementario que se cobra en dos cuotas',d:1},
+ {m:'E',ans:'BARILOCHE',clue:'Ciudad rionegrina del chocolate y el Nahuel Huapi',d:1},
+ {m:'E',ans:'CACEROLAZO',clue:'Protesta que se hace golpeando ollas',d:2},
+ {m:'E',ans:'DESCAMISADOS',clue:'Así llamaba Evita a los trabajadores peronistas',d:3},
+ {m:'E',ans:'ESTANCIA',clue:'Gran establecimiento rural dedicado al campo',d:1},
+ {m:'E',ans:'FACTURAS',clue:'Medialunas, vigilantes y cañoncitos, en general',d:1},
+ {m:'E',ans:'GAUCHO',clue:'Jinete legendario de la pampa argentina',d:1},
+ {m:'E',ans:'HIPÓDROMO',clue:'Donde corren los caballos, como el de Palermo',d:2},
+ {m:'E',ans:'ISLA',clue:'Porción de tierra rodeada de agua, como las del Tigre',d:1},
+ {m:'E',ans:'JUBILACIÓN',clue:'Haber mensual que cobra quien se retiró de trabajar',d:1},
+ {m:'E',ans:'LUNFARDO',clue:'Jerga porteña del tango: mina, laburo, bondi',d:3},
+ {m:'E',ans:'MEDIALUNA',clue:'Factura curva: de manteca o de grasa',d:1},
+ {m:'E',ans:'NAIPES',clue:'Cartas con las que se juega al truco',d:1},
+ {m:'E',ans:'ÑANDÚ',clue:'Ave corredora de la pampa, parecida al avestruz',d:1},
+ {m:'E',ans:'ONCE',clue:'Barrio comercial porteño y número que sigue al diez',d:1},
+ {m:'E',ans:'PATO',clue:'Deporte nacional argentino que se juega a caballo',d:1},
+ {m:'E',ans:'QUESO',clue:'Con dulce de batata forma el postre vigilante',d:1},
+ {m:'E',ans:'RIACHUELO',clue:'Curso de agua que separa la Ciudad de Buenos Aires de Avellaneda',d:1},
+ {m:'E',ans:'SIESTA',clue:'Descanso sagrado después del almuerzo en el interior',d:1},
+ {m:'E',ans:'TRUCO',clue:'Juego de cartas con envido, flor y mucha mentira',d:1},
+ {m:'E',ans:'UNIVERSIDAD',clue:'La de Córdoba es la más antigua del país',d:1},
+ {m:'E',ans:'VOS',clue:'Pronombre con el que los argentinos reemplazamos al tú',d:1},
+ {m:'C',ans:'TAXI',clue:'Transporte porteño negro y amarillo',d:1},
+ {m:'E',ans:'YACARÉ',clue:'Caimán de los esteros del litoral',d:1},
+ {m:'E',ans:'ZAPALLO',clue:'Calabaza criolla infaltable en el puchero',d:1},
+]},
+{name:'Semifinal 2 · Rosco dorado',w:[
+ {m:'E',ans:'AVENIDA',clue:'La 9 de Julio es la más ancha del mundo',d:1},
+ {m:'E',ans:'BOMBACHA',clue:'Pantalón amplio que usa el gaucho; la de campo',d:1},
+ {m:'E',ans:'CHORIPÁN',clue:'Sánguche de chorizo, clásico de cancha y costanera',d:1},
+ {m:'E',ans:'DOMINÓ',clue:'Juego de mesa con fichas blancas y puntos negros',d:1},
+ {m:'E',ans:'ESTADIO',clue:'El Monumental es el más grande del país',d:1},
+ {m:'E',ans:'FRONTERA',clue:'Límite que separa dos países',d:1},
+ {m:'E',ans:'GUITARRA',clue:'Instrumento de Yupanqui y de todos los fogones',d:1},
+ {m:'E',ans:'HIELO',clue:'El del glaciar o el que le ponés al fernet',d:1},
+ {m:'E',ans:'IMPERDIBLE',clue:'Alfiler de gancho; también algo que no te podés perder',d:2},
+ {m:'E',ans:'JARDÍN',clue:'El de infantes es la primera etapa escolar',d:1},
+ {m:'E',ans:'LITORAL',clue:'Región argentina de Entre Ríos, Corrientes y Misiones',d:2},
+ {m:'E',ans:'MALBEC',clue:'Cepa emblema del vino argentino',d:1},
+ {m:'E',ans:'NIDO',clue:'El del hornero es de barro y tiene forma de horno',d:1},
+ {m:'C',ans:'CAÑA',clue:'Con ruda se toma el primero de agosto',d:1},
+ {m:'E',ans:'OESTE',clue:'Punto cardinal por donde se pone el sol; también zona del Gran Buenos Aires',d:1},
+ {m:'E',ans:'PEÑA',clue:'Reunión folclórica con guitarras, vino y empanadas',d:1},
+ {m:'E',ans:'QUÍMICA',clue:'Ciencia de los elementos; también la que tiene una buena pareja',d:2},
+ {m:'E',ans:'RUTA',clue:'La 40 recorre el país de norte a sur pegada a los Andes',d:1},
+ {m:'E',ans:'SIFÓN',clue:'Botella con gas para tirar soda',d:1},
+ {m:'E',ans:'TONADA',clue:'Acento provinciano, como el cantito cordobés',d:2},
+ {m:'E',ans:'UNO',clue:'Juego de cartas de colores y primer número natural',d:1},
+ {m:'E',ans:'VEREDA',clue:'Por ahí caminás; los vecinos la baldean a la mañana',d:1},
+ {m:'C',ans:'OXÍGENO',clue:'Gas del aire que respiramos, esencial para vivir',d:1},
+ {m:'E',ans:'YUYO',clue:'Hierba silvestre; algunos se le echan al mate',d:1},
+ {m:'E',ans:'ZAGUÁN',clue:'Pasillo de entrada de las casas chorizo',d:3},
+]},
+{name:'Final · Rosco celeste',w:[
+ {m:'E',ans:'ALPARGATA',clue:'Calzado criollo de lona con suela de yute',d:2},
+ {m:'E',ans:'BOINA',clue:'Gorra chata y redonda del paisano',d:2},
+ {m:'E',ans:'CUARTETO',clue:'Música popular cordobesa; el tunga-tunga',d:2},
+ {m:'E',ans:'DÁRSENA',clue:'Parte del puerto donde amarran los barcos',d:3},
+ {m:'E',ans:'ESQUEL',clue:'Ciudad chubutense adonde llega La Trochita',d:2},
+ {m:'E',ans:'FILETEADO',clue:'Arte decorativo porteño de líneas, flores y firuletes',d:3},
+ {m:'E',ans:'GUARANGO',clue:'Persona grosera y maleducada',d:2},
+ {m:'E',ans:'HECTÁREA',clue:'Diez mil metros cuadrados de campo',d:2},
+ {m:'E',ans:'IMÁN',clue:'Atrae al hierro y lo pegás en la heladera',d:2},
+ {m:'E',ans:'JOPO',clue:'Peinado con el pelo levantado sobre la frente',d:2},
+ {m:'E',ans:'LABURO',clue:'Trabajo, dicho en lunfardo',d:2},
+ {m:'E',ans:'MALAMBO',clue:'Danza folclórica masculina de zapateo',d:2},
+ {m:'E',ans:'NOGAL',clue:'Árbol que da la nuez',d:2},
+ {m:'C',ans:'AÑEJO',clue:'Se dice del vino o del ron con muchos años de guarda',d:2},
+ {m:'E',ans:'ORQUESTA',clue:'La típica del tango lleva bandoneones y violines',d:2},
+ {m:'E',ans:'PUCARÁ',clue:'Fortaleza indígena del noroeste, como la de Tilcara',d:3},
+ {m:'E',ans:'QUINCHO',clue:'Espacio techado de la casa donde se hace el asado',d:2},
+ {m:'E',ans:'RAMBLA',clue:'Paseo costero, como el de Mar del Plata',d:2},
+ {m:'E',ans:'SULKY',clue:'Carruaje liviano de campo tirado por un caballo',d:3},
+ {m:'E',ans:'TERERÉ',clue:'Mate frío con jugo o agua helada, típico del litoral',d:2},
+ {m:'E',ans:'UTILERO',clue:'En un club, el que cuida y prepara los materiales del plantel',d:2},
+ {m:'E',ans:'VIDALA',clue:'Canto norteño melancólico que se acompaña con caja',d:3},
+ {m:'C',ans:'AUXILIO',clue:'Pedido de socorro; también la rueda de repuesto',d:1},
+ {m:'E',ans:'YUNTA',clue:'Pareja inseparable de amigos; también un par de bueyes',d:2},
+ {m:'E',ans:'ZAINO',clue:'Pelaje oscuro y uniforme de un caballo',d:3},
+]},
+{name:'Final · Rosco dorado',w:[
+ {m:'E',ans:'ALJIBE',clue:'Pozo de agua de las casas coloniales',d:3},
+ {m:'E',ans:'BAGUAL',clue:'Caballo salvaje, todavía sin domar',d:3},
+ {m:'E',ans:'CHAMAMÉ',clue:'Música litoraleña que se baila abrazado, con acordeón',d:2},
+ {m:'E',ans:'DOMA',clue:'Destreza criolla de amansar caballos',d:2},
+ {m:'E',ans:'ESTRIBO',clue:'Ahí apoya el pie el jinete; la última copa es la del…',d:2},
+ {m:'E',ans:'FOGÓN',clue:'Fuego de campamento alrededor del cual se canta',d:2},
+ {m:'E',ans:'GARÚA',clue:'Llovizna fina y persistente, muy porteña',d:2},
+ {m:'E',ans:'HORNERO',clue:'Pájaro nacional argentino que construye su casa de barro',d:1},
+ {m:'E',ans:'INGENIO',clue:'Fábrica azucarera tucumana; también agudeza mental',d:2},
+ {m:'E',ans:'JINETE',clue:'Quien monta a caballo',d:1},
+ {m:'E',ans:'LAPACHO',clue:'Árbol del norte que florece en rosado',d:2},
+ {m:'E',ans:'MAZAMORRA',clue:'Postre criollo de maíz blanco con leche',d:3},
+ {m:'E',ans:'NOVILLO',clue:'Vacuno joven que suele terminar en la parrilla',d:2},
+ {m:'C',ans:'MUÑECA',clue:'Habilidad fina para manejar situaciones; también parte del brazo',d:1},
+ {m:'E',ans:'OCHAVA',clue:'Esquina cortada en diagonal de las manzanas porteñas',d:3},
+ {m:'E',ans:'PULPERÍA',clue:'Almacén, bar y club social del campo del 1800',d:3},
+ {m:'E',ans:'QUENA',clue:'Flauta andina de caña',d:3},
+ {m:'E',ans:'RASTRA',clue:'Cinturón gaucho adornado con monedas',d:3},
+ {m:'E',ans:'SORRENTINOS',clue:'Pasta rellena redonda inventada en Mar del Plata',d:2},
+ {m:'E',ans:'TROPILLA',clue:'Conjunto de caballos que andan juntos',d:2},
+ {m:'E',ans:'UTOPÍA',clue:'Lugar ideal que no existe en ninguna parte',d:3},
+ {m:'E',ans:'VINCHA',clue:'Cinta que sujeta el pelo; también la usan los tenistas',d:2},
+ {m:'C',ans:'EXPRESO',clue:'Tren rápido sin paradas; también un café cargado',d:2},
+ {m:'E',ans:'YARARÁ',clue:'Víbora venenosa de nuestros campos',d:2},
+ {m:'E',ans:'ZAFRA',clue:'Cosecha de la caña de azúcar',d:2},
+]},
+{name:'Rosco 7',w:[
+ {m:'E',ans:'AZULEJO',clue:'Cerámica que cubre paredes de cocinas y baños',d:2},
+ {m:'E',ans:'BUDÍN',clue:'El de pan es postre clásico de las abuelas',d:1},
+ {m:'E',ans:'COLECTIVO',clue:'Transporte urbano que los argentinos inventamos en 1928',d:1},
+ {m:'E',ans:'DAMAJUANA',clue:'Botellón grande de vino, forrado en mimbre',d:3},
+ {m:'E',ans:'EMPATE',clue:'Resultado sin ganador ni perdedor',d:1},
+ {m:'E',ans:'FAINÁ',clue:'Masa de garbanzos que se pide arriba de la pizza',d:1},
+ {m:'E',ans:'GOL',clue:'El grito más argentino del fútbol',d:1},
+ {m:'E',ans:'HERRADURA',clue:'Se clava en el casco del caballo y dicen que da suerte',d:1},
+ {m:'E',ans:'INVIERNO',clue:'Estación más fría del año',d:1},
+ {m:'E',ans:'JUEZ',clue:'Imparte justicia; en la cancha le dicen árbitro',d:1},
+ {m:'E',ans:'LEVADURA',clue:'Hace crecer la masa del pan',d:1},
+ {m:'E',ans:'MONDONGO',clue:'Panza vacuna, base de un guiso bien criollo',d:1},
+ {m:'E',ans:'NUTRIA',clue:'Roedor de los arroyos y lagunas bonaerenses',d:1},
+ {m:'C',ans:'PIÑATA',clue:'Se rompe a palazos en los cumpleaños y llueven caramelos',d:1},
+ {m:'E',ans:'OTOÑO',clue:'Estación en la que caen las hojas',d:1},
+ {m:'E',ans:'PROVOLETA',clue:'Queso a la parrilla que abre el asado',d:1},
+ {m:'E',ans:'QUINIELA',clue:'Juego de azar: soñaste un número y lo jugás',d:1},
+ {m:'E',ans:'REMERA',clue:'Prenda de algodón de mangas cortas',d:1},
+ {m:'E',ans:'SODA',clue:'Agua con gas que sale del sifón',d:1},
+ {m:'E',ans:'TEATRO',clue:'El Colón es el más famoso del país',d:1},
+ {m:'E',ans:'UÑA',clue:'Se pinta con esmalte',d:1},
+ {m:'E',ans:'VERANO',clue:'Estación de las vacaciones y el calor',d:1},
+ {m:'C',ans:'ÓXIDO',clue:'Capa rojiza que ataca al hierro con la humedad',d:2},
+ {m:'E',ans:'YOGUR',clue:'Lácteo fermentado del desayuno',d:1},
+ {m:'E',ans:'ZAPATILLA',clue:'Calzado deportivo; las de lona son un clásico',d:1},
+]},
+{name:'Rosco 8',w:[
+ {m:'E',ans:'ARROYO',clue:'Río chiquito',d:1},
+ {m:'E',ans:'BALCÓN',clue:'Desde el de la Casa Rosada saludó más de un presidente',d:1},
+ {m:'E',ans:'CARPINCHO',clue:'El roedor más grande del mundo, estrella de Nordelta',d:1},
+ {m:'E',ans:'DESCANSO',clue:'Entretiempo del partido; también lo que pide el cuerpo',d:1},
+ {m:'E',ans:'ESCOBA',clue:'Sirve para barrer; también juego de cartas del quince',d:1},
+ {m:'E',ans:'FAROL',clue:'Ilumina la calle desde un poste',d:1},
+ {m:'E',ans:'GOLONDRINA',clue:'Ave migratoria que anuncia la primavera',d:2},
+ {m:'E',ans:'HAMACA',clue:'Juguete de plaza que va y viene',d:1},
+ {m:'E',ans:'IMPRENTA',clue:'Invento de Gutenberg para reproducir libros',d:2},
+ {m:'E',ans:'JAULA',clue:'Casa con barrotes del canario',d:1},
+ {m:'E',ans:'LECHUZA',clue:'Ave nocturna que gira la cabeza',d:1},
+ {m:'E',ans:'MONEDA',clue:'Dinero metálico que ya casi no usamos',d:1},
+ {m:'E',ans:'NARANJA',clue:'Fruta cítrica y color a la vez',d:1},
+ {m:'C',ans:'ARAÑA',clue:'Teje su tela en los rincones',d:1},
+ {m:'E',ans:'OLLA',clue:'Ahí se cocina el guiso; popular cuando es comunitaria',d:1},
+ {m:'E',ans:'PAVA',clue:'Se calienta en la hornalla para el mate',d:1},
+ {m:'E',ans:'QUIOSCO',clue:'Vende golosinas en cada esquina',d:1},
+ {m:'E',ans:'RELÁMPAGO',clue:'Luz del cielo en plena tormenta',d:1},
+ {m:'E',ans:'SAPO',clue:'Anfibio del jardín; también juego de puntería con fichas',d:1},
+ {m:'E',ans:'TIJERA',clue:'Herramienta de dos hojas para cortar',d:1},
+ {m:'E',ans:'UNIVERSO',clue:'Todo lo que existe: estrellas, planetas y nosotros',d:1},
+ {m:'E',ans:'VENTILADOR',clue:'La salvación del verano antes del aire acondicionado',d:1},
+ {m:'C',ans:'EXAMEN',clue:'Prueba que se rinde en la facultad',d:1},
+ {m:'E',ans:'YEMA',clue:'La parte amarilla del huevo',d:1},
+ {m:'E',ans:'ZANAHORIA',clue:'Verdura naranja amiga de los conejos',d:1},
+]},
+{name:'Rosco 9',w:[
+ {m:'E',ans:'ANDÉN',clue:'Ahí esperás el tren',d:2},
+ {m:'E',ans:'BARRILETE',clue:'Se remonta con viento e hilo; cósmico si es Messi',d:2},
+ {m:'E',ans:'CEBADOR',clue:'El que sirve los mates en la ronda',d:3},
+ {m:'E',ans:'DEDAL',clue:'Protege el dedo al coser',d:3},
+ {m:'E',ans:'ESCALERA',clue:'Peldaños para subir de un piso a otro',d:1},
+ {m:'E',ans:'FERIA',clue:'Mercado al aire libre de frutas y verduras',d:1},
+ {m:'E',ans:'GUANACO',clue:'Camélido patagónico pariente de la llama',d:2},
+ {m:'E',ans:'HELADERA',clue:'Electrodoméstico que mantiene fría la comida',d:1},
+ {m:'E',ans:'INTENDENTE',clue:'Gobierna un municipio',d:2},
+ {m:'E',ans:'JAZMÍN',clue:'Flor blanca y perfumada del jardín de las abuelas',d:2},
+ {m:'E',ans:'LIMONADA',clue:'Bebida refrescante de fruta cítrica',d:1},
+ {m:'E',ans:'MOLINETE',clue:'Lo cruzás con la SUBE para entrar al subte',d:2},
+ {m:'E',ans:'NIEBLA',clue:'Nube a ras del piso que complica la ruta',d:2},
+ {m:'C',ans:'BAÑO',clue:'El cuarto más buscado de la casa',d:1},
+ {m:'E',ans:'ORILLA',clue:'Borde del río o del mar',d:1},
+ {m:'E',ans:'PAÑUELO',clue:'Se revolea bailando la zamba',d:1},
+ {m:'E',ans:'QUEMADO',clue:'Juego en el que te eliminan de un pelotazo',d:1},
+ {m:'E',ans:'ROCÍO',clue:'Gotitas de la mañana sobre el pasto',d:2},
+ {m:'E',ans:'SEMÁFORO',clue:'Rojo, amarillo y verde en la esquina',d:1},
+ {m:'E',ans:'TERRAZA',clue:'Techo plano donde se toma sol y se hacen asados',d:1},
+ {m:'E',ans:'UNICORNIO',clue:'Caballo mitológico con un cuerno',d:1},
+ {m:'E',ans:'VELA',clue:'Ilumina cuando se corta la luz; se sopla en el cumpleaños',d:1},
+ {m:'C',ans:'TÓRAX',clue:'Parte del cuerpo entre el cuello y el abdomen',d:2},
+ {m:'E',ans:'YUNQUE',clue:'Sobre él martilla el herrero',d:3},
+ {m:'E',ans:'ZURDO',clue:'Que usa la mano izquierda, como Maradona',d:1},
+]},
+{name:'Rosco 10',w:[
+ {m:'E',ans:'ABUELO',clue:'El papá de tu papá',d:1},
+ {m:'E',ans:'BIGOTE',clue:'Pelo sobre el labio, famoso en varios próceres',d:1},
+ {m:'E',ans:'CANCHA',clue:'Donde se juega al fútbol',d:1},
+ {m:'E',ans:'DOMINGO',clue:'Día de pastas en lo de la nona',d:1},
+ {m:'E',ans:'ESQUINA',clue:'Donde se cruzan dos calles',d:1},
+ {m:'E',ans:'FIDEOS',clue:'Con tuco y queso rallado, clásico de los domingos',d:1},
+ {m:'E',ans:'GORRO',clue:'Abriga la cabeza en invierno',d:1},
+ {m:'E',ans:'HINCHADA',clue:'La que alienta y hace temblar la tribuna',d:1},
+ {m:'E',ans:'IDIOMA',clue:'El nuestro es el castellano',d:1},
+ {m:'E',ans:'JUGUETE',clue:'Lo que más esperan los chicos el Día del Niño',d:1},
+ {m:'E',ans:'LANA',clue:'La da la oveja y con ella se tejen bufandas',d:1},
+ {m:'E',ans:'MOCHILA',clue:'La cargan los chicos camino a la escuela',d:1},
+ {m:'E',ans:'NIETO',clue:'El hijo de tu hijo',d:1},
+ {m:'C',ans:'SEÑAL',clue:'La de tránsito indica cómo manejar',d:1},
+ {m:'E',ans:'OVEJA',clue:'Animal lanudo de la Patagonia',d:1},
+ {m:'E',ans:'PELOTA',clue:'Redonda y de cuero: no se mancha, dijo Diego',d:1},
+ {m:'E',ans:'QUINCE',clue:'Edad del festejo grande de las chicas',d:1},
+ {m:'E',ans:'RECREO',clue:'El mejor momento de la escuela',d:1},
+ {m:'E',ans:'SOMBRA',clue:'La buscás bajo el árbol en enero',d:1},
+ {m:'E',ans:'TORTA',clue:'No puede faltar en un cumpleaños, con velitas',d:1},
+ {m:'E',ans:'ÚLTIMO',clue:'Lo contrario de primero',d:1},
+ {m:'E',ans:'VACA',clue:'De ella sale el bife',d:1},
+ {m:'C',ans:'MIXTO',clue:'Sánguche de jamón y queso',d:1},
+ {m:'E',ans:'YESO',clue:'Te lo ponen cuando te quebrás',d:1},
+ {m:'E',ans:'ZAPATO',clue:'Calzado elegante que se lustra',d:1},
+]},
+{name:'Rosco 11',w:[
+ {m:'E',ans:'APERO',clue:'Conjunto de monturas y arreos del caballo',d:3},
+ {m:'E',ans:'BOTINES',clue:'Calzado con tapones para jugar al fútbol',d:1},
+ {m:'E',ans:'COMPARSA',clue:'Grupo que desfila en el carnaval, como en Gualeguaychú',d:2},
+ {m:'E',ans:'DESEMPATE',clue:'Lo que define un partido igualado',d:1},
+ {m:'E',ans:'EMBUDO',clue:'Sirve para pasar líquido a una botella sin volcar',d:1},
+ {m:'E',ans:'FLETE',clue:'Camioncito que te hace la mudanza',d:1},
+ {m:'E',ans:'GAMBETA',clue:'Amague para dejar pagando al rival',d:1},
+ {m:'E',ans:'HAZAÑA',clue:'Logro extraordinario que queda en la historia',d:2},
+ {m:'E',ans:'INVICTO',clue:'Equipo que no perdió ningún partido',d:1},
+ {m:'E',ans:'JARRA',clue:'Recipiente con manija para servir el jugo',d:1},
+ {m:'E',ans:'LOMITO',clue:'Sánguche cordobés de carne, completo',d:1},
+ {m:'E',ans:'MORRÓN',clue:'Pimiento rojo de la parrilla y el escabeche',d:1},
+ {m:'E',ans:'NOCAUT',clue:'Golpe que termina la pelea de box',d:2},
+ {m:'C',ans:'ALBAÑIL',clue:'Levanta paredes con cal y ladrillos',d:1},
+ {m:'E',ans:'OJOTA',clue:'Calzado de verano que va entre los dedos',d:1},
+ {m:'E',ans:'PARRILLA',clue:'Sobre ella se hace el asado',d:1},
+ {m:'E',ans:'QUEBRADA',clue:'La de Humahuaca es patrimonio de la humanidad',d:2},
+ {m:'E',ans:'REFUGIO',clue:'Casita de montaña donde paran los andinistas',d:1},
+ {m:'E',ans:'SOBREMESA',clue:'Charla larga que sigue después del postre',d:1},
+ {m:'E',ans:'TAPADO',clue:'Abrigo largo; también el jugador desconocido que la rompe',d:2},
+ {m:'E',ans:'USINA',clue:'Planta que genera electricidad',d:3},
+ {m:'E',ans:'VITEL',clue:'El toné es infaltable en Navidad',d:3},
+ {m:'C',ans:'FÉNIX',clue:'Ave mitológica que renace de las cenizas',d:3},
+ {m:'E',ans:'YAGUARETÉ',clue:'El felino más grande de América, vive en el norte',d:2},
+ {m:'E',ans:'ZONZO',clue:'Tonto, bobo, en criollo',d:2},
+]},
+{name:'Rosco 12',w:[
+ {m:'E',ans:'ALMACÉN',clue:'Negocio de barrio donde se compra de todo',d:1},
+ {m:'E',ans:'BANDERA',clue:'La creó Belgrano a orillas del Paraná',d:1},
+ {m:'E',ans:'CICLOVÍA',clue:'Carril exclusivo para bicicletas',d:2},
+ {m:'E',ans:'DELANTAL',clue:'Protege la ropa cuando cocinás',d:2},
+ {m:'E',ans:'ESTATUA',clue:'Figura de bronce o mármol de las plazas',d:2},
+ {m:'E',ans:'FOGATA',clue:'Fuego al aire libre que se prende en la noche de San Juan',d:2},
+ {m:'E',ans:'GRINGO',clue:'Así le decían en el campo al inmigrante europeo',d:2},
+ {m:'E',ans:'HORMIGÓN',clue:'Mezcla de cemento, arena y piedra de la construcción',d:2},
+ {m:'E',ans:'INTERIOR',clue:'Todo lo que no es Buenos Aires, para los porteños',d:1},
+ {m:'E',ans:'JERINGA',clue:'La usa el enfermero para las vacunas',d:1},
+ {m:'E',ans:'LAUREL',clue:'Hoja que perfuma el tuco; corona de campeones',d:1},
+ {m:'E',ans:'MARIPOSA',clue:'Insecto de alas de colores; también estilo de natación',d:1},
+ {m:'E',ans:'NEVADA',clue:'Cuando Buenos Aires se vistió de blanco en 2007',d:2},
+ {m:'C',ans:'MAÑANA',clue:'Primera parte del día; también el día que viene',d:1},
+ {m:'E',ans:'OLIVA',clue:'Aceituna; su aceite es orgullo de Mendoza',d:1},
+ {m:'E',ans:'PINGÜINO',clue:'Ave que no vuela y desfila en Punta Tombo',d:1},
+ {m:'E',ans:'QUIRÓFANO',clue:'Sala donde se opera',d:2},
+ {m:'E',ans:'RONDA',clue:'La de mate gira de mano en mano; también canción infantil',d:1},
+ {m:'E',ans:'SERENATA',clue:'Canción de amor al pie del balcón',d:2},
+ {m:'E',ans:'TIMÓN',clue:'Con él se maneja el barco',d:2},
+ {m:'E',ans:'UNIFORME',clue:'Ropa igual para todos: el escolar o el del club',d:1},
+ {m:'E',ans:'VITRINA',clue:'Mueble con vidrio donde se lucen las copas del club',d:2},
+ {m:'C',ans:'SAXO',clue:'Instrumento de viento del jazz',d:2},
+ {m:'E',ans:'YACIMIENTO',clue:'De ahí se saca petróleo, como en Vaca Muerta',d:2},
+ {m:'E',ans:'ZAMBULLIDA',clue:'Salto de cabeza a la pileta',d:2},
+]},
+{name:'Rosco 13',w:[
+ {m:'E',ans:'ASADOR',clue:'El responsable de que la carne salga a punto',d:1},
+ {m:'E',ans:'BIZCOCHITOS',clue:'Los de grasa acompañan el mate',d:2},
+ {m:'E',ans:'CABALGATA',clue:'Paseo largo a caballo',d:2},
+ {m:'E',ans:'DURAZNO',clue:'Fruta de carozo del verano',d:1},
+ {m:'E',ans:'ESPUELA',clue:'Va en la bota del gaucho y apura al caballo',d:2},
+ {m:'E',ans:'FLAN',clue:'Postre que se pide mixto: con dulce y crema',d:1},
+ {m:'E',ans:'GAVIOTA',clue:'Ave de la costa que te roba el sánguche en la playa',d:1},
+ {m:'E',ans:'HORIZONTE',clue:'Línea donde el cielo toca la tierra; en la pampa se ve entera',d:2},
+ {m:'E',ans:'IMITADOR',clue:'Artista que copia voces famosas',d:2},
+ {m:'E',ans:'JUNTADA',clue:'Reunión informal de amigos',d:1},
+ {m:'E',ans:'LAGARTO',clue:'Reptil que toma sol; también corte de carne para milanesas',d:2},
+ {m:'E',ans:'MANGUERA',clue:'Con ella se riega el jardín',d:1},
+ {m:'E',ans:'NOSTALGIA',clue:'Sentimiento tanguero de extrañar lo que pasó',d:1},
+ {m:'C',ans:'CARIÑO',clue:'Afecto, amor del bueno',d:1},
+ {m:'E',ans:'ORTIGA',clue:'Planta que pica si la tocás',d:2},
+ {m:'E',ans:'PICADA',clue:'Tabla de fiambres y quesos previa al asado',d:1},
+ {m:'E',ans:'QUIROGA',clue:'Horacio, el cuentista de la selva misionera',d:2},
+ {m:'E',ans:'REJA',clue:'Protege puertas y ventanas',d:1},
+ {m:'E',ans:'SUBTE',clue:'Tren bajo tierra porteño, el primero de Latinoamérica',d:1},
+ {m:'E',ans:'TUCO',clue:'Salsa de tomate de los tallarines del domingo',d:1},
+ {m:'E',ans:'URGENCIA',clue:'Sala de guardia del hospital',d:1},
+ {m:'E',ans:'VAQUITA',clue:'La de San Antonio trae suerte; también plata juntada entre todos',d:1},
+ {m:'C',ans:'EXTRA',clue:'Lo que viene de más; actor sin diálogo en una película',d:2},
+ {m:'E',ans:'YEGUA',clue:'La hembra del caballo',d:1},
+ {m:'E',ans:'ZAPADA',clue:'Encuentro musical improvisado entre amigos',d:2},
+]},
+{name:'Rosco 14',w:[
+ {m:'E',ans:'AGUACERO',clue:'Lluvia fuerte y repentina',d:2},
+ {m:'E',ans:'BOLICHE',clue:'Ahí se baila hasta la madrugada; también almacén de campo',d:1},
+ {m:'E',ans:'CANELONES',clue:'Pasta rellena enrollada del domingo',d:1},
+ {m:'E',ans:'DESFILE',clue:'El militar es clásico del 9 de Julio',d:1},
+ {m:'E',ans:'ESCARBADIENTES',clue:'Palito que sostiene los cubitos de queso en las picadas',d:1},
+ {m:'E',ans:'FUELLE',clue:'Así le dicen los tangueros al bandoneón',d:3},
+ {m:'E',ans:'GUARDAPOLVO',clue:'El blanco identifica a maestros y alumnos',d:1},
+ {m:'E',ans:'HUMITA',clue:'Comida norteña de choclo, envuelta en chala',d:2},
+ {m:'E',ans:'INTERVALO',clue:'Pausa entre dos actos del teatro',d:2},
+ {m:'E',ans:'JAQUE',clue:'Amenaza al rey en el ajedrez; mate si es el final',d:2},
+ {m:'E',ans:'LUCIÉRNAGA',clue:'Bichito que prende su lucecita de noche',d:1},
+ {m:'E',ans:'MURGA',clue:'Baile de tambores y levita del carnaval porteño',d:1},
+ {m:'E',ans:'NUBE',clue:'Algodón del cielo que trae lluvia',d:1},
+ {m:'C',ans:'NIÑERA',clue:'Cuida a los chicos cuando los padres salen',d:1},
+ {m:'E',ans:'OASIS',clue:'Agua y palmeras en medio del desierto',d:1},
+ {m:'E',ans:'PERGAMINO',clue:'Ciudad bonaerense; también papel antiguo enrollado',d:3},
+ {m:'E',ans:'QUINTA',clue:'Casa de fin de semana con parrilla y pileta',d:1},
+ {m:'E',ans:'RAVIOLES',clue:'Pasta rellena cuadradita',d:1},
+ {m:'E',ans:'SIRENA',clue:'Mitad mujer, mitad pez; también suena en la ambulancia',d:1},
+ {m:'E',ans:'TRIBUNA',clue:'Desde ahí alienta la hinchada',d:1},
+ {m:'E',ans:'UKELELE',clue:'Guitarrita hawaiana de cuatro cuerdas',d:2},
+ {m:'E',ans:'VAGÓN',clue:'Cada coche del tren',d:1},
+ {m:'C',ans:'SEXTETO',clue:'Conjunto de seis músicos, clásico del tango',d:2},
+ {m:'E',ans:'YETA',clue:'Mala suerte, mufa',d:1},
+ {m:'E',ans:'ZÓCALO',clue:'Borde que protege la pared a ras del piso',d:3},
+]},
+{name:'Rosco 15',w:[
+ {m:'E',ans:'ANTEOJOS',clue:'Se usan para ver mejor; negros si son de sol',d:2},
+ {m:'E',ans:'BICICLETA',clue:'Vehículo de dos ruedas a pedal',d:1},
+ {m:'E',ans:'CHACARERA',clue:'Danza folclórica santiagueña',d:2},
+ {m:'E',ans:'DESAYUNO',clue:'Primera comida del día',d:1},
+ {m:'E',ans:'ENSALADA',clue:'Mezcla de verduras crudas; la mixta lleva lechuga, tomate y cebolla',d:1},
+ {m:'E',ans:'FANTASMA',clue:'Aparición con sábana que asusta de noche',d:1},
+ {m:'E',ans:'GIRASOL',clue:'Flor amarilla que sigue al sol; da semillas y aceite',d:1},
+ {m:'E',ans:'HORNALLA',clue:'Fuego de la cocina donde apoyás la pava',d:1},
+ {m:'E',ans:'IGLESIA',clue:'Templo con campanario frente a la plaza de cada pueblo',d:1},
+ {m:'E',ans:'JABÓN',clue:'Con él te lavás las manos',d:1},
+ {m:'E',ans:'LINTERNA',clue:'Luz de mano para los cortes de luz',d:1},
+ {m:'E',ans:'MARTILLO',clue:'Herramienta para clavar clavos',d:1},
+ {m:'E',ans:'NARIZ',clue:'Parte de la cara con la que olés',d:1},
+ {m:'C',ans:'PESTAÑA',clue:'Pelitos que protegen el ojo',d:1},
+ {m:'E',ans:'ORQUÍDEA',clue:'Flor exótica y elegante, difícil de cuidar',d:2},
+ {m:'E',ans:'PONCHO',clue:'Abrigo criollo que se pasa por la cabeza',d:1},
+ {m:'E',ans:'QUIRQUINCHO',clue:'Armadillo del norte argentino',d:2},
+ {m:'E',ans:'REPOSERA',clue:'Silla plegable para tomar sol',d:1},
+ {m:'E',ans:'SERRUCHO',clue:'Herramienta de dientes para cortar madera',d:1},
+ {m:'E',ans:'TORMENTA',clue:'Lluvia con truenos y relámpagos',d:1},
+ {m:'C',ans:'MUSEO',clue:'Edificio donde se exhiben obras de arte e historia',d:1},
+ {m:'E',ans:'VENTANA',clue:'Abertura de la casa por donde entra la luz',d:1},
+ {m:'C',ans:'TEXTO',clue:'Conjunto de palabras escritas',d:1},
+ {m:'E',ans:'YOYÓ',clue:'Juguete que sube y baja por un hilo',d:1},
+ {m:'E',ans:'ZORRO',clue:'Animal astuto; también justiciero enmascarado de la tele',d:1},
+]},
+{name:'Rosco 16',w:[
+ {m:'E',ans:'ARQUERO',clue:'El único jugador que puede usar las manos',d:1},
+ {m:'E',ans:'BOTELLA',clue:'Envase de vidrio del vino y la cerveza',d:1},
+ {m:'E',ans:'CAMPANA',clue:'Suena en el campanario; también barrio porteño con puerto',d:2},
+ {m:'E',ans:'DELFÍN',clue:'Mamífero marino inteligente que salta en el mar',d:1},
+ {m:'E',ans:'ESPEJO',clue:'Te devuelve tu imagen',d:1},
+ {m:'E',ans:'FRUTILLA',clue:'Fruta roja; la del postre va con crema',d:1},
+ {m:'E',ans:'GLOBO',clue:'Se infla para los cumpleaños; aerostático si vuela',d:1},
+ {m:'E',ans:'HILO',clue:'Con aguja, sirve para coser',d:1},
+ {m:'E',ans:'IMPERMEABLE',clue:'Abrigo que no deja pasar la lluvia',d:2},
+ {m:'E',ans:'JUGO',clue:'Exprimido de fruta para el desayuno',d:1},
+ {m:'E',ans:'LADRILLO',clue:'Bloque rojo con el que se levantan paredes',d:1},
+ {m:'E',ans:'MERMELADA',clue:'Dulce de fruta para untar las tostadas',d:1},
+ {m:'E',ans:'NOVELA',clue:'Libro largo de ficción; también la de la tarde en la tele',d:2},
+ {m:'C',ans:'MOÑO',clue:'Lazo decorativo de los regalos',d:1},
+ {m:'E',ans:'OBRERO',clue:'Trabajador de la construcción o la fábrica',d:2},
+ {m:'E',ans:'PILETA',clue:'En ella te zambullís en verano',d:1},
+ {m:'E',ans:'QUINOTO',clue:'Cítrico chiquito que se come en almíbar',d:2},
+ {m:'E',ans:'ROPERO',clue:'Mueble grande donde se guarda la ropa',d:1},
+ {m:'E',ans:'SANDÍA',clue:'Fruta gigante de verano, verde afuera y roja adentro',d:1},
+ {m:'E',ans:'TAMBO',clue:'Establecimiento rural donde se ordeñan las vacas',d:2},
+ {m:'E',ans:'UMBRAL',clue:'Parte de abajo de la puerta de entrada',d:1},
+ {m:'E',ans:'VINAGRE',clue:'Aderezo ácido de la ensalada',d:1},
+ {m:'C',ans:'EXCURSIÓN',clue:'Paseo en grupo, clásico del colegio',d:1},
+ {m:'E',ans:'YATE',clue:'Embarcación de lujo',d:1},
+ {m:'E',ans:'ZANJA',clue:'Surco abierto en la tierra para que corra el agua',d:1},
+]},
+{name:'Rosco 17',w:[
+ {m:'E',ans:'ACORDEÓN',clue:'Instrumento a fuelle del chamamé',d:2},
+ {m:'E',ans:'BIBLIOTECA',clue:'Sala llena de libros para leer en silencio',d:2},
+ {m:'E',ans:'CANDADO',clue:'Cierra la cadena de la bici; se abre con llave',d:1},
+ {m:'E',ans:'DADO',clue:'Cubo con puntos del uno al seis',d:1},
+ {m:'E',ans:'EQUIPAJE',clue:'Las valijas y bolsos de un viaje',d:2},
+ {m:'E',ans:'FERROCARRIL',clue:'El Roca, el Mitre y el Sarmiento lo son',d:2},
+ {m:'E',ans:'GRANIZO',clue:'Piedras de hielo que arruinan los autos',d:2},
+ {m:'E',ans:'HUERTA',clue:'Pedazo de tierra donde cultivás tomates y lechuga',d:2},
+ {m:'E',ans:'INSIGNIA',clue:'Distintivo que se prende en el pecho o la gorra',d:3},
+ {m:'E',ans:'JOYA',clue:'Anillo, collar o pulsera de valor',d:1},
+ {m:'E',ans:'LECHÓN',clue:'Cerdito que se hace entero a las brasas en las fiestas',d:2},
+ {m:'E',ans:'MOLINO',clue:'En el campo saca agua con el viento',d:2},
+ {m:'E',ans:'NUDO',clue:'Atadura que hacés con los cordones',d:1},
+ {m:'C',ans:'CABAÑA',clue:'Casita de madera en el bosque o la montaña',d:1},
+ {m:'E',ans:'OCÉANO',clue:'El Atlántico baña nuestra costa',d:2},
+ {m:'E',ans:'PANADERÍA',clue:'Negocio del pan y las facturas',d:1},
+ {m:'E',ans:'QUEROSÉN',clue:'Combustible de las estufas y faroles de antes',d:3},
+ {m:'E',ans:'REMOLINO',clue:'Giro de viento o de agua; también el del pelo',d:2},
+ {m:'E',ans:'SEMILLA',clue:'De ella nace la planta',d:2},
+ {m:'E',ans:'TENEDOR',clue:'Cubierto de dientes para pinchar',d:1},
+ {m:'C',ans:'TRUENO',clue:'Ruido del cielo que sigue al relámpago',d:1},
+ {m:'E',ans:'VOLCÁN',clue:'Montaña que escupe lava',d:2},
+ {m:'C',ans:'MÁXIMO',clue:'Lo más grande posible; lo contrario de mínimo',d:2},
+ {m:'E',ans:'YUDO',clue:'Arte marcial japonés de llaves y caídas',d:2},
+ {m:'E',ans:'ZEPELÍN',clue:'Globo dirigible gigante de principios del siglo XX',d:3},
+]},
+{name:'Rosco 18',w:[
+ {m:'E',ans:'ANCLA',clue:'Hierro que se tira al fondo para frenar el barco',d:1},
+ {m:'E',ans:'BALLENA',clue:'La franca austral visita Puerto Madryn',d:1},
+ {m:'E',ans:'COSECHA',clue:'Recolección de lo sembrado en el campo',d:2},
+ {m:'E',ans:'DIBUJO',clue:'Lo hacen los chicos con lápices de colores',d:1},
+ {m:'E',ans:'ESCENARIO',clue:'Tablado donde tocan las bandas',d:2},
+ {m:'E',ans:'FLAUTA',clue:'Instrumento de viento; también pan largo y finito',d:1},
+ {m:'E',ans:'GOMERA',clue:'Horqueta con elástico para tirar piedritas',d:2},
+ {m:'E',ans:'HOTEL',clue:'Ahí dormís cuando viajás',d:1},
+ {m:'E',ans:'INVERNADERO',clue:'Casa de nailon o vidrio donde crecen las plantas',d:2},
+ {m:'E',ans:'JAMÓN',clue:'Fiambre del sánguche; crudo o cocido',d:1},
+ {m:'E',ans:'LIBRETA',clue:'Cuadernito de notas; la de la escuela trae las calificaciones',d:1},
+ {m:'E',ans:'MICRO',clue:'Ómnibus de larga distancia',d:1},
+ {m:'E',ans:'NAVIDAD',clue:'Fiesta del 25 de diciembre con pan dulce y sidra',d:1},
+ {m:'C',ans:'CIGÜEÑA',clue:'Ave zancuda que, dicen, trae a los bebés',d:1},
+ {m:'E',ans:'OLFATO',clue:'Sentido con el que percibís los olores',d:2},
+ {m:'E',ans:'PORTERO',clue:'Cuida el edificio y barre la vereda',d:1},
+ {m:'E',ans:'QUÓRUM',clue:'Cantidad mínima de presentes para sesionar en el Congreso',d:3},
+ {m:'E',ans:'REGADERA',clue:'Recipiente con flor de ducha para las plantas',d:2},
+ {m:'E',ans:'SOGA',clue:'Cuerda gruesa; también la de saltar',d:1},
+ {m:'E',ans:'TIBURÓN',clue:'Pez temible de aleta dorsal',d:1},
+ {m:'C',ans:'PUENTE',clue:'Cruza el río de una orilla a la otra',d:1},
+ {m:'E',ans:'VAINILLA',clue:'Sabor clásico del helado; también galletita del postre',d:2},
+ {m:'C',ans:'EXPLORADOR',clue:'Aventurero que recorre tierras desconocidas',d:2},
+ {m:'E',ans:'YANQUI',clue:'Así le decimos al estadounidense',d:2},
+ {m:'E',ans:'ZAPATERO',clue:'Arregla suelas y tacos; también quedarse sin ganar en las cartas',d:2},
+]},
+{name:'Rosco 19',w:[
+ {m:'E',ans:'ABANICO',clue:'Se despliega para darse aire en verano',d:1},
+ {m:'E',ans:'BIDÓN',clue:'Envase grande para llevar agua o nafta',d:1},
+ {m:'E',ans:'CUCHARA',clue:'Cubierto para tomar la sopa',d:1},
+ {m:'E',ans:'DISFRAZ',clue:'Ropa para transformarte en otro en una fiesta',d:1},
+ {m:'E',ans:'ESTRELLA',clue:'Brilla en el cielo de noche; el sol es una',d:1},
+ {m:'E',ans:'FUENTE',clue:'Tira agua en la plaza; también bandeja para servir',d:1},
+ {m:'E',ans:'GUISO',clue:'Comida de olla que salva el invierno',d:1},
+ {m:'E',ans:'HELICÓPTERO',clue:'Vuela con hélices y aterriza en cualquier lado',d:1},
+ {m:'E',ans:'IMPRESORA',clue:'Saca en papel lo que tenés en la pantalla',d:1},
+ {m:'E',ans:'JIRAFA',clue:'El animal más alto, de cuello larguísimo',d:1},
+ {m:'E',ans:'LLAVERO',clue:'Argolla donde juntás todas las llaves',d:1},
+ {m:'E',ans:'MADRINA',clue:'Te acompaña en el bautismo junto al padrino',d:2},
+ {m:'E',ans:'NUEZ',clue:'Fruto seco de cáscara dura que se rompe en Navidad',d:1},
+ {m:'C',ans:'MONTAÑA',clue:'Elevación grande de terreno, como las de los Andes',d:1},
+ {m:'E',ans:'ORDEÑE',clue:'Sacarle la leche a la vaca',d:2},
+ {m:'E',ans:'PERSIANA',clue:'Se baja para que no entre el sol al cuarto',d:1},
+ {m:'E',ans:'QUIJADA',clue:'Hueso de la mandíbula',d:3},
+ {m:'E',ans:'RULO',clue:'Bucle del pelo enrulado',d:1},
+ {m:'E',ans:'SAUCE',clue:'Árbol llorón de la orilla del río',d:1},
+ {m:'E',ans:'TÍTERE',clue:'Muñeco que se mueve con la mano desde abajo',d:1},
+ {m:'C',ans:'FUEGO',clue:'Llama que cocina el asado',d:1},
+ {m:'E',ans:'VESTUARIO',clue:'Ahí se cambian los jugadores antes del partido',d:2},
+ {m:'C',ans:'EXCAVADORA',clue:'Máquina de obra con pala gigante',d:2},
+ {m:'E',ans:'YERNO',clue:'El marido de tu hija',d:1},
+ {m:'E',ans:'ZOOLÓGICO',clue:'Parque donde viven animales de todo el mundo',d:1},
+]},
+{name:'Rosco 20',w:[
+ {m:'E',ans:'ALMANAQUE',clue:'Calendario de pared que se cambia cada año',d:1},
+ {m:'E',ans:'BOMBERO',clue:'Apaga incendios con manguera y casco',d:1},
+ {m:'E',ans:'CARNAVAL',clue:'Fiesta de febrero con murgas y espuma',d:1},
+ {m:'E',ans:'DOCENA',clue:'Doce unidades; así se compran las facturas',d:1},
+ {m:'E',ans:'ENCHUFE',clue:'Ahí conectás los electrodomésticos',d:1},
+ {m:'E',ans:'FRAZADA',clue:'Manta gruesa de la cama en invierno',d:1},
+ {m:'E',ans:'GALPÓN',clue:'Construcción grande del campo donde se guardan máquinas',d:2},
+ {m:'E',ans:'HERRERO',clue:'Trabaja el hierro a golpe de martillo',d:2},
+ {m:'E',ans:'INMIGRANTE',clue:'Llegó de otro país; millones vinieron en barco',d:2},
+ {m:'E',ans:'JILGUERO',clue:'Pajarito cantor de nuestros campos',d:2},
+ {m:'E',ans:'LOBO',clue:'El marino descansa en las escolleras de Mar del Plata',d:1},
+ {m:'E',ans:'MAREA',clue:'Subida y bajada diaria del mar',d:2},
+ {m:'E',ans:'NAFTALINA',clue:'Bolitas blancas contra las polillas del placard',d:2},
+ {m:'C',ans:'PUÑO',clue:'Mano cerrada',d:1},
+ {m:'E',ans:'OREJA',clue:'Con ella escuchás',d:1},
+ {m:'E',ans:'PRIMAVERA',clue:'Estación de las flores; arranca el 21 de septiembre',d:1},
+ {m:'E',ans:'QUINCENA',clue:'Quince días; también el pago de mitad de mes',d:2},
+ {m:'E',ans:'RÍO',clue:'El de la Plata es el más ancho del mundo',d:1},
+ {m:'E',ans:'SOMBRERO',clue:'Se usa en la cabeza; el gaucho no sale sin el suyo',d:1},
+ {m:'E',ans:'TALADRO',clue:'Herramienta eléctrica para hacer agujeros',d:2},
+ {m:'E',ans:'USUARIO',clue:'El que usa un servicio o una aplicación',d:2},
+ {m:'E',ans:'VIOLÍN',clue:'Instrumento de cuerdas que se apoya en el hombro',d:1},
+ {m:'C',ans:'EXTRANJERO',clue:'Que viene de otro país',d:2},
+ {m:'E',ans:'YELMO',clue:'Casco de la armadura medieval',d:3},
+ {m:'E',ans:'ZARANDA',clue:'Criba para separar el grano de la paja',d:3},
+]},
+{name:'Rosco 21',w:[
+ {m:'E',ans:'ARCOÍRIS',clue:'Arco de colores que sale después de la lluvia',d:1},
+ {m:'E',ans:'BOTIQUÍN',clue:'Cajita con vendas y remedios para emergencias',d:1},
+ {m:'E',ans:'CHIMENEA',clue:'Por ahí sale el humo del hogar a leña',d:1},
+ {m:'E',ans:'DELANTERO',clue:'El jugador que tiene que hacer los goles',d:1},
+ {m:'E',ans:'ENVIDO',clue:'Canto del truco que apuesta por los puntos',d:2},
+ {m:'E',ans:'FÓSFORO',clue:'Palito con cabeza que enciende el fuego',d:1},
+ {m:'E',ans:'GUANTE',clue:'Abriga o protege la mano; el arquero usa dos',d:1},
+ {m:'E',ans:'HARINA',clue:'Polvo blanco del pan y las pastas',d:1},
+ {m:'E',ans:'ÍDOLO',clue:'Figura que la gente admira con devoción',d:1},
+ {m:'E',ans:'JARDINERO',clue:'Cuida plantas y corta el pasto; también pantalón con pechera',d:1},
+ {m:'E',ans:'LANCHA',clue:'Embarcación rápida, la colectiva te lleva por el Tigre',d:1},
+ {m:'E',ans:'MIMBRE',clue:'Con él se tejen canastos y sillones',d:2},
+ {m:'E',ans:'NOCHE',clue:'Parte del día sin sol',d:1},
+ {m:'C',ans:'REBAÑO',clue:'Conjunto de ovejas',d:1},
+ {m:'E',ans:'OVILLO',clue:'Bola de lana con la que juega el gato',d:1},
+ {m:'E',ans:'PESCADOR',clue:'Tira la caña a la orilla del río',d:1},
+ {m:'E',ans:'QUESILLO',clue:'Queso fresco norteño que se come con miel de caña',d:3},
+ {m:'E',ans:'RANCHO',clue:'Vivienda humilde de adobe y paja del campo',d:1},
+ {m:'E',ans:'SURUBÍ',clue:'Pez gigante de los grandes ríos del litoral',d:2},
+ {m:'E',ans:'TAZA',clue:'En ella se sirve el café con leche',d:1},
+ {m:'C',ans:'LUNA',clue:'Ilumina la noche y tiene fases',d:1},
+ {m:'E',ans:'VIENTO',clue:'Aire en movimiento que vuela los papeles',d:1},
+ {m:'C',ans:'EXPEDICIÓN',clue:'Viaje de exploración a un lugar remoto',d:2},
+ {m:'E',ans:'YOGA',clue:'Disciplina de posturas y respiración',d:1},
+ {m:'E',ans:'ZAFIRO',clue:'Piedra preciosa de color azul',d:2},
+]},
+{name:'Rosco 22',w:[
+ {m:'E',ans:'AHORRO',clue:'Plata que guardás en vez de gastar',d:1},
+ {m:'E',ans:'BAÚL',clue:'Caja grande con tapa; también la parte trasera del auto',d:1},
+ {m:'E',ans:'COMETA',clue:'Astro con cola que cruza el cielo, como el Halley',d:1},
+ {m:'E',ans:'DIARIO',clue:'Se lee a la mañana con el desayuno; trae las noticias',d:1},
+ {m:'E',ans:'ESPUMA',clue:'Burbujas blancas de la cerveza o el jabón',d:1},
+ {m:'E',ans:'FLEQUILLO',clue:'Pelo cortado que cae sobre la frente',d:1},
+ {m:'E',ans:'GUARDAVIDAS',clue:'Vigila la playa desde su silla alta',d:2},
+ {m:'E',ans:'HURACÁN',clue:'Tormenta giratoria gigante; también club de Parque Patricios',d:1},
+ {m:'E',ans:'IGUANA',clue:'Reptil de cresta que toma sol en el norte',d:2},
+ {m:'E',ans:'JEFE',clue:'El que manda en el trabajo',d:1},
+ {m:'E',ans:'LIEBRE',clue:'Parecida al conejo pero más rápida, corre por el campo',d:1},
+ {m:'E',ans:'MANTECA',clue:'Se unta en la tostada; las medialunas pueden ser de ella',d:1},
+ {m:'E',ans:'NORIA',clue:'La vuelta al mundo del parque de diversiones',d:2},
+ {m:'C',ans:'SUEÑO',clue:'Lo que tenés cuando bostezás; también lo que soñás',d:1},
+ {m:'E',ans:'ORO',clue:'Metal precioso de la medalla del campeón',d:1},
+ {m:'E',ans:'PALOMA',clue:'Ave de plaza; la blanca simboliza la paz',d:1},
+ {m:'E',ans:'QUIMERA',clue:'Ilusión imposible; también monstruo mitológico',d:3},
+ {m:'E',ans:'REMO',clue:'Con él se impulsa el bote',d:1},
+ {m:'E',ans:'SALERO',clue:'Recipiente de la sal en la mesa',d:1},
+ {m:'E',ans:'TREN',clue:'Corre sobre rieles de estación en estación',d:1},
+ {m:'C',ans:'NÚMERO',clue:'El uno, el dos y el tres lo son',d:1},
+ {m:'E',ans:'VALIJA',clue:'Se hace antes de viajar, con ruedas si es moderna',d:1},
+ {m:'C',ans:'AXILA',clue:'Hueco debajo del brazo, donde hacen cosquillas',d:2},
+ {m:'E',ans:'YEDRA',clue:'Planta trepadora que cubre paredes enteras',d:2},
+ {m:'E',ans:'ZUMBIDO',clue:'Ruido del mosquito en la oreja a la madrugada',d:1},
+]},
+{name:'Rosco 23',w:[
+ {m:'E',ans:'ASFALTO',clue:'Cubre las calles; se derrite en enero',d:1},
+ {m:'E',ans:'BANQUINA',clue:'Costado de la ruta donde parás si pinchás',d:2},
+ {m:'E',ans:'CORCHO',clue:'Tapón del vino que salta en los brindis',d:1},
+ {m:'E',ans:'DESTAPADOR',clue:'Sin él no abrís la cerveza',d:1},
+ {m:'E',ans:'ESQUÍ',clue:'Deporte de nieve de Bariloche y Las Leñas',d:1},
+ {m:'E',ans:'FOLCLORE',clue:'Música tradicional argentina, la de las peñas',d:2},
+ {m:'E',ans:'GASEOSA',clue:'Bebida con burbujas de la mesa del domingo',d:1},
+ {m:'E',ans:'HIPO',clue:'Espasmo que se corta con un susto, dicen',d:1},
+ {m:'E',ans:'INCÓGNITA',clue:'Lo que no se sabe; la x de la ecuación',d:2},
+ {m:'E',ans:'JUEVES',clue:'Día de la semana antes del viernes',d:1},
+ {m:'E',ans:'LATA',clue:'Envase de metal de la gaseosa o el tomate',d:1},
+ {m:'E',ans:'MANZANA',clue:'Fruta de la tentación; también cuadra del barrio',d:1},
+ {m:'E',ans:'NUCA',clue:'Parte de atrás del cuello',d:1},
+ {m:'C',ans:'ESTAÑO',clue:'Metal con el que se sueldan los circuitos',d:3},
+ {m:'E',ans:'OMBLIGO',clue:'Marca que te queda en la panza de nacimiento',d:1},
+ {m:'E',ans:'PAN',clue:'Sale del horno de la panadería; nuestro de cada día',d:1},
+ {m:'E',ans:'QUINTERO',clue:'El que trabaja la quinta de verduras',d:3},
+ {m:'E',ans:'RAQUETA',clue:'Con ella se juega al tenis',d:1},
+ {m:'E',ans:'SUEGRA',clue:'La mamá de tu pareja',d:1},
+ {m:'E',ans:'TOALLA',clue:'Te secás con ella al salir de la ducha',d:1},
+ {m:'E',ans:'URRACA',clue:'Ave bulliciosa de plumaje blanco y negro',d:2},
+ {m:'E',ans:'VERDULERÍA',clue:'Negocio de frutas y verduras del barrio',d:1},
+ {m:'C',ans:'EXPRIMIDOR',clue:'Aparato para sacarle el jugo a la naranja',d:1},
+ {m:'E',ans:'YESQUERO',clue:'Encendedor de bolsillo',d:1},
+ {m:'E',ans:'ZANCOS',clue:'Palos altos sobre los que caminan los artistas de circo',d:2},
+]},
+{name:'Rosco 24',w:[
+ {m:'E',ans:'AJEDREZ',clue:'Juego de reyes, torres y alfiles sobre 64 casillas',d:1},
+ {m:'E',ans:'BRASAS',clue:'Carbón al rojo vivo sobre el que se asa la carne',d:1},
+ {m:'E',ans:'CHACRA',clue:'Campo chico de cultivo y animales',d:2},
+ {m:'E',ans:'DESPENSA',clue:'Lugar de la casa donde se guardan los alimentos',d:2},
+ {m:'E',ans:'ENERO',clue:'Mes de vacaciones y calor, el primero del año',d:1},
+ {m:'E',ans:'FOCO',clue:'Lamparita que se enrosca; también centro de atención',d:1},
+ {m:'E',ans:'GOLEADOR',clue:'El que más goles hace en el torneo',d:1},
+ {m:'E',ans:'HÉROE',clue:'Los de Malvinas tienen su día el 2 de abril',d:2},
+ {m:'E',ans:'INODORO',clue:'El trono del baño',d:1},
+ {m:'E',ans:'JUNCO',clue:'Planta flexible de la orilla; con ella se tejen canastos',d:2},
+ {m:'E',ans:'LEÑA',clue:'Madera para el fuego del hogar',d:1},
+ {m:'E',ans:'MOZO',clue:'Te toma el pedido en el restorán',d:1},
+ {m:'E',ans:'NEUMÁTICO',clue:'Rueda de goma del auto',d:1},
+ {m:'C',ans:'BUÑUELO',clue:'Fritura dulce o de acelga; con la lluvia, de membrillo y mate',d:2},
+ {m:'E',ans:'OFICIO',clue:'Trabajo manual que se aprende con los años: plomero, herrero',d:2},
+ {m:'E',ans:'PULPO',clue:'Animal marino de ocho brazos',d:1},
+ {m:'E',ans:'QUITASOL',clue:'Sombrilla grande de la playa',d:2},
+ {m:'E',ans:'RELOJ',clue:'Marca la hora en la muñeca o la pared',d:1},
+ {m:'E',ans:'SILBATO',clue:'Lo sopla el árbitro para cobrar falta',d:1},
+ {m:'E',ans:'TERNERO',clue:'La cría de la vaca',d:1},
+ {m:'E',ans:'UTENSILIO',clue:'Herramienta de cocina: espumadera, cucharón, pinza',d:2},
+ {m:'E',ans:'VELERO',clue:'Barco que avanza con el viento en las velas',d:2},
+ {m:'C',ans:'CONEXIÓN',clue:'Sin ella no anda el wifi',d:1},
+ {m:'E',ans:'YETI',clue:'El abominable hombre de las nieves',d:1},
+ {m:'E',ans:'ZAMBOMBAZO',clue:'Tiro fortísimo desde afuera del área',d:2},
+]},
+{name:'Rosco 25',w:[
+ {m:'E',ans:'ARADO',clue:'Herramienta que abre la tierra antes de sembrar',d:2},
+ {m:'E',ans:'BIZCOCHUELO',clue:'Base esponjosa de la torta de cumpleaños',d:2},
+ {m:'E',ans:'CHOCLO',clue:'Maíz tierno de la humita y el locro',d:1},
+ {m:'E',ans:'DUENDE',clue:'Personajito travieso de gorro de los cuentos',d:2},
+ {m:'E',ans:'ESTUFA',clue:'Calefacciona la casa en invierno',d:1},
+ {m:'E',ans:'FRENO',clue:'Pedal con el que detenés el auto',d:1},
+ {m:'E',ans:'GRILLO',clue:'Insecto que canta de noche en el pasto',d:1},
+ {m:'E',ans:'HACHA',clue:'Herramienta filosa para cortar leña',d:1},
+ {m:'E',ans:'IMPUESTO',clue:'Lo que se le paga al Estado, como Ganancias',d:2},
+ {m:'E',ans:'JOROBA',clue:'La carga el camello en el lomo',d:2},
+ {m:'E',ans:'LECHUGA',clue:'Hoja verde básica de la ensalada',d:1},
+ {m:'E',ans:'MOLLEJA',clue:'Achura fina y codiciada de la parrilla',d:2},
+ {m:'E',ans:'NOTICIA',clue:'Lo que cuentan los diarios y noticieros',d:1},
+ {m:'C',ans:'VIÑEDO',clue:'Plantación de vides de Mendoza',d:2},
+ {m:'E',ans:'ÓLEO',clue:'Pintura espesa de los cuadros clásicos',d:3},
+ {m:'E',ans:'PAREDÓN',clue:'Muro alto y ciego; también frontón para pelotear',d:2},
+ {m:'E',ans:'QUEBRANTO',clue:'Pena o quiebre económico',d:3},
+ {m:'E',ans:'RASTRILLO',clue:'Herramienta de dientes para juntar hojas',d:1},
+ {m:'E',ans:'SIDRA',clue:'Espumante de manzana del brindis de Navidad',d:1},
+ {m:'E',ans:'TIMBRE',clue:'Se toca en la puerta para que te abran',d:1},
+ {m:'E',ans:'ÚTILES',clue:'Lápices, cuadernos y reglas de la lista escolar',d:1},
+ {m:'E',ans:'VIRREY',clue:'Gobernaba estas tierras en nombre del rey de España',d:2},
+ {m:'C',ans:'ÉXITO',clue:'Triunfo, resultado feliz',d:1},
+ {m:'E',ans:'YERBAL',clue:'Plantación misionera de la planta del mate',d:3},
+ {m:'E',ans:'ZORZAL',clue:'Pájaro cantor; criollo si es Gardel',d:1},
+]},
+{name:'Rosco 26',w:[
+ {m:'E',ans:'AZÚCAR',clue:'Endulza el café; la de Tucumán sale de la caña',d:1},
+ {m:'E',ans:'BOSQUE',clue:'Terreno lleno de árboles, como los de Palermo',d:1},
+ {m:'E',ans:'CARTERO',clue:'Reparte las cartas casa por casa',d:1},
+ {m:'E',ans:'DIENTE',clue:'Pieza de la boca que cuida el dentista',d:1},
+ {m:'E',ans:'EDIFICIO',clue:'Construcción alta de departamentos',d:1},
+ {m:'E',ans:'FAMILIA',clue:'Padres, hijos, tíos y abuelos',d:1},
+ {m:'E',ans:'GOLFO',clue:'Entrada grande del mar en la costa, como el San Matías',d:2},
+ {m:'E',ans:'HEBILLA',clue:'Broche metálico del cinturón',d:2},
+ {m:'E',ans:'INGENIERO',clue:'Profesional que diseña puentes y máquinas',d:2},
+ {m:'E',ans:'JUNTA',clue:'La Primera, de mayo de 1810, fue nuestro primer gobierno',d:2},
+ {m:'E',ans:'LÁMPARA',clue:'Da luz desde la mesita o el techo',d:1},
+ {m:'E',ans:'MURCIÉLAGO',clue:'Mamífero volador que duerme cabeza abajo',d:2},
+ {m:'E',ans:'NEGOCIO',clue:'Local de barrio que vende algo; también un buen trato',d:1},
+ {m:'C',ans:'PEÑÓN',clue:'Roca grande y elevada, como el de Gibraltar',d:3},
+ {m:'E',ans:'ORTOGRAFÍA',clue:'Escribir sin faltas; lo que evalúa el dictado',d:2},
+ {m:'E',ans:'PALANGANA',clue:'Recipiente ancho para lavar a mano o poner los pies',d:2},
+ {m:'E',ans:'QUERUBÍN',clue:'Angelito regordete de los cuadros',d:3},
+ {m:'E',ans:'RUISEÑOR',clue:'Pájaro famoso por su canto nocturno',d:2},
+ {m:'E',ans:'SERPENTINA',clue:'Rollo de papel que se arroja en el carnaval',d:2},
+ {m:'E',ans:'TROMPO',clue:'Juguete de madera que gira con un piolín',d:1},
+ {m:'E',ans:'UJIER',clue:'Empleado que custodia las puertas en tribunales y congresos',d:3},
+ {m:'E',ans:'VENDAJE',clue:'Vendas que envuelven una lastimadura',d:2},
+ {m:'C',ans:'BÓXER',clue:'Perro de cara chata; también calzoncillo',d:1},
+ {m:'E',ans:'YODO',clue:'Antiséptico que pinta de marrón las lastimaduras',d:1},
+ {m:'E',ans:'ZAMPOÑA',clue:'Flauta andina de varios tubos',d:3},
+]},
+{name:'Rosco 27',w:[
+ {m:'E',ans:'AEROPUERTO',clue:'De ahí despegan los aviones; Ezeiza es el más grande',d:2},
+ {m:'E',ans:'BARCO',clue:'Embarcación grande; en uno llegaron los abuelos',d:1},
+ {m:'E',ans:'CIRUELA',clue:'Fruta de carozo, morada o roja',d:1},
+ {m:'E',ans:'DESIERTO',clue:'Tierra árida casi sin agua ni plantas',d:1},
+ {m:'E',ans:'ESPIGA',clue:'Cabeza del trigo donde van los granos',d:3},
+ {m:'E',ans:'FÁBRICA',clue:'Edificio industrial donde se producen cosas en serie',d:1},
+ {m:'E',ans:'GASA',clue:'Tela finita y porosa para curar heridas',d:2},
+ {m:'E',ans:'HOGAR',clue:'La casa donde vivís; también el fuego a leña del living',d:1},
+ {m:'E',ans:'INSECTO',clue:'Bicho de seis patas, como la hormiga o el mosquito',d:1},
+ {m:'E',ans:'JABALINA',clue:'Lanza que se arroja en el atletismo',d:2},
+ {m:'E',ans:'LADERA',clue:'Costado inclinado de una montaña',d:2},
+ {m:'E',ans:'MERCADO',clue:'El Central abastece de frutas y verduras a Buenos Aires',d:1},
+ {m:'E',ans:'NÁUFRAGO',clue:'Sobreviviente de un barco hundido, solo en una isla',d:2},
+ {m:'C',ans:'CAÑADA',clue:'Cauce de arroyo entre lomas; la famosa cruza Córdoba',d:3},
+ {m:'E',ans:'OCASO',clue:'Momento en que se pone el sol',d:3},
+ {m:'E',ans:'PERDIZ',clue:'Ave de campo que vuela bajito; fueron felices y comieron…',d:2},
+ {m:'E',ans:'QUINOA',clue:'Grano andino de moda en las ensaladas',d:2},
+ {m:'E',ans:'REPULGUE',clue:'Trenzado que cierra el borde de la empanada',d:2},
+ {m:'E',ans:'SALAMÍN',clue:'Embutido de la picada; el de Tandil es famoso',d:1},
+ {m:'E',ans:'TRANQUERA',clue:'Puerta de palos de la entrada del campo',d:2},
+ {m:'C',ans:'TRUCHA',clue:'Pez de los ríos patagónicos; también algo falso, en lunfardo',d:1},
+ {m:'E',ans:'VILLANCICO',clue:'Canción navideña',d:2},
+ {m:'C',ans:'EXPERIMENTO',clue:'Prueba científica de laboratorio',d:2},
+ {m:'E',ans:'YUGO',clue:'Madero que une a los bueyes; también una opresión',d:2},
+ {m:'E',ans:'ZARZUELA',clue:'Teatro musical español; también guiso de mariscos',d:3},
+]},
+{name:'Rosco 28',w:[
+ {m:'E',ans:'ALAMBRE',clue:'Hilo de metal de los cercos del campo',d:2},
+ {m:'E',ans:'BALDOSA',clue:'Placa del piso de la vereda; la floja te moja en días de lluvia',d:2},
+ {m:'E',ans:'CRUCERO',clue:'Barco gigante de vacaciones con pileta y shows',d:2},
+ {m:'E',ans:'DUCHA',clue:'Baño de lluvia, rápido y de parado',d:1},
+ {m:'E',ans:'ESCUDO',clue:'El del club va bordado en la camiseta',d:1},
+ {m:'E',ans:'FAENA',clue:'Trabajo rural duro; también la del frigorífico',d:3},
+ {m:'E',ans:'GUIRNALDA',clue:'Tira decorativa que se cuelga en las fiestas',d:2},
+ {m:'E',ans:'HONGO',clue:'Crece en la humedad; el champiñón es uno comestible',d:1},
+ {m:'E',ans:'IMPERIO',clue:'El romano y el inca lo fueron',d:2},
+ {m:'E',ans:'JENGIBRE',clue:'Raíz picante de la cocina asiática y el té',d:2},
+ {m:'E',ans:'LIMÓN',clue:'Cítrico ácido; Tucumán es su capital mundial',d:1},
+ {m:'E',ans:'MEMBRILLO',clue:'Su dulce forma el vigilante junto al queso',d:1},
+ {m:'E',ans:'NORTE',clue:'Punto cardinal que señala la brújula',d:1},
+ {m:'C',ans:'SEÑUELO',clue:'Carnada o engaño para atraer',d:3},
+ {m:'E',ans:'OLA',clue:'La hace el mar; también la hinchada en la cancha',d:1},
+ {m:'E',ans:'PAMPERO',clue:'Viento frío del sudoeste que limpia el cielo',d:2},
+ {m:'E',ans:'QUEJIDO',clue:'Sonido de dolor o lamento',d:2},
+ {m:'E',ans:'RIENDA',clue:'Correa con la que el jinete guía al caballo',d:2},
+ {m:'E',ans:'SURCO',clue:'Línea que deja el arado en la tierra',d:2},
+ {m:'E',ans:'TIZA',clue:'Con ella se escribe en el pizarrón',d:1},
+ {m:'C',ans:'GAUCHADA',clue:'Favor desinteresado, bien criollo',d:2},
+ {m:'E',ans:'VIDRIERA',clue:'Vitrina del negocio que se mira desde la calle',d:1},
+ {m:'C',ans:'FLEXIÓN',clue:'Ejercicio de brazos contra el piso',d:2},
+ {m:'E',ans:'YARETA',clue:'Planta andina compacta y verde que crece en la puna',d:3},
+ {m:'E',ans:'ZIGZAG',clue:'Línea que va y viene en ángulos',d:1},
+]},
+{name:'Rosco 29',w:[
+ {m:'E',ans:'ACELGA',clue:'Verdura de hoja de la tarta y el buñuelo',d:2},
+ {m:'E',ans:'BERENJENA',clue:'Verdura violeta del escabeche y la parrilla',d:2},
+ {m:'E',ans:'CAMPEÓN',clue:'El que levanta la copa',d:1},
+ {m:'E',ans:'DARDO',clue:'Flechita que se tira al blanco en el bar',d:2},
+ {m:'E',ans:'ESPONJA',clue:'Absorbe agua y sirve para lavar los platos',d:1},
+ {m:'E',ans:'FELPUDO',clue:'Alfombrita de la entrada donde te limpiás los zapatos',d:1},
+ {m:'E',ans:'GANADERÍA',clue:'Cría de vacas y ovejas, motor del campo argentino',d:2},
+ {m:'E',ans:'HOJA',clue:'La del árbol cae en otoño; la de papel se escribe',d:1},
+ {m:'E',ans:'INVENTO',clue:'Creación nueva, como la birome de Bíró',d:2},
+ {m:'E',ans:'JUICIO',clue:'Proceso en tribunales con juez y abogados',d:2},
+ {m:'E',ans:'LUCERO',clue:'Estrella brillante del amanecer',d:3},
+ {m:'E',ans:'MOSAICO',clue:'Piso de piezas pequeñas; también obra hecha de pedacitos',d:2},
+ {m:'E',ans:'NOVENA',clue:'División infantil del club donde empiezan los pibes',d:3},
+ {m:'C',ans:'RIÑÓN',clue:'Órgano doble que filtra la sangre; también achura',d:1},
+ {m:'E',ans:'ORUGA',clue:'Antes de ser mariposa fue esto',d:1},
+ {m:'E',ans:'PELUQUERO',clue:'Te corta el pelo',d:1},
+ {m:'E',ans:'QUILOMBO',clue:'Lío, desorden grande, en criollo',d:1},
+ {m:'E',ans:'ROCA',clue:'Piedra grande; también apellido de un presidente del 80',d:2},
+ {m:'E',ans:'SAPUCAY',clue:'Grito agudo y festivo del chamamé correntino',d:3},
+ {m:'E',ans:'TOBOGÁN',clue:'Te deslizás por él en la plaza',d:1},
+ {m:'C',ans:'CUCHILLO',clue:'Cubierto que corta la carne',d:1},
+ {m:'E',ans:'VENADO',clue:'Ciervo de campo; Tuerto si es la ciudad santafesina',d:1},
+ {m:'C',ans:'EXCUSA',clue:'Pretexto para zafar de algo',d:1},
+ {m:'E',ans:'YEÍSMO',clue:'Nuestra forma de pronunciar la elle, como en "cabasho"',d:3},
+ {m:'E',ans:'ZAPALLITO',clue:'Verdura redonda y verde que se come relleno',d:1},
+]},
+{name:'Rosco 30',w:[
+ {m:'E',ans:'AMANECER',clue:'Momento en que sale el sol',d:1},
+ {m:'E',ans:'BOTÓN',clue:'Cierra la camisa; también buchón, en lunfardo',d:2},
+ {m:'E',ans:'CHISPA',clue:'Salta del fuego o del enchufe; también ingenio rápido',d:1},
+ {m:'E',ans:'DIPLOMA',clue:'Papel enmarcado que certifica que te recibiste',d:1},
+ {m:'E',ans:'ECLIPSE',clue:'Cuando la luna tapa al sol',d:1},
+ {m:'E',ans:'FARMACIA',clue:'Negocio de remedios con cruz verde',d:1},
+ {m:'E',ans:'GORRIÓN',clue:'Pajarito marrón de todas las plazas',d:1},
+ {m:'E',ans:'HUELLA',clue:'Marca que dejan los pies; también canción criolla',d:1},
+ {m:'E',ans:'IRUPÉ',clue:'Planta acuática gigante y redonda de los esteros',d:3},
+ {m:'E',ans:'JUVENTUD',clue:'Etapa de la vida entre la niñez y la adultez',d:1},
+ {m:'E',ans:'LANGOSTA',clue:'Marisco de lujo; también insecto que arrasa cosechas',d:2},
+ {m:'E',ans:'MULITA',clue:'Armadillo chiquito de la pampa',d:2},
+ {m:'E',ans:'NIÑEZ',clue:'Etapa de la vida de los juegos y la escuela primaria',d:2},
+ {m:'C',ans:'ENSEÑANZA',clue:'Lo que dejan los maestros y la experiencia',d:2},
+ {m:'E',ans:'OFRENDA',clue:'Lo que se le deja a la Pachamama o la Difunta Correa',d:2},
+ {m:'E',ans:'PORTÓN',clue:'Puerta grande del garaje',d:1},
+ {m:'E',ans:'QUIETUD',clue:'Calma total, sin movimiento',d:2},
+ {m:'E',ans:'REVANCHA',clue:'La pide el que perdió',d:1},
+ {m:'E',ans:'SOBRE',clue:'Guarda la carta; se cierra lamiendo el borde',d:1},
+ {m:'E',ans:'TERREMOTO',clue:'Sacudón de la tierra, como el de San Juan del 44',d:1},
+ {m:'C',ans:'MUELLE',clue:'Plataforma del puerto donde amarran los botes; también resorte',d:2},
+ {m:'E',ans:'VÍSPERA',clue:'El día anterior a una fecha importante',d:3},
+ {m:'C',ans:'EXPENSAS',clue:'Las paga todos los meses el que vive en departamento',d:1},
+ {m:'E',ans:'YÓQUEY',clue:'Jinete profesional de las carreras del hipódromo',d:3},
+ {m:'E',ans:'ZOZOBRA',clue:'Angustia e incertidumbre',d:3},
+]},
+{name:'Rosco 31',w:[
+ {m:'E',ans:'ALFIL',clue:'Pieza del ajedrez que se mueve en diagonal',d:1},
+ {m:'E',ans:'BANDEJA',clue:'En ella el mozo lleva los vasos',d:1},
+ {m:'E',ans:'CINTURÓN',clue:'Sujeta el pantalón; el de seguridad te salva en el auto',d:1},
+ {m:'E',ans:'DESVÁN',clue:'Cuarto de arriba donde se guardan los trastos viejos',d:3},
+ {m:'E',ans:'ESTORNUDO',clue:'Explosión de la nariz que se responde con un salud',d:1},
+ {m:'E',ans:'FRONTÓN',clue:'Pared alta contra la que se juega a la paleta',d:3},
+ {m:'E',ans:'GRANJA',clue:'Campo chico con gallinas, chanchos y huerta',d:1},
+ {m:'E',ans:'HÍGADO',clue:'Órgano que procesa lo que tomás; se come encebollado',d:2},
+ {m:'E',ans:'IZQUIERDA',clue:'La mano del costado del corazón',d:1},
+ {m:'E',ans:'JORNAL',clue:'Paga por un día de trabajo en el campo o la obra',d:3},
+ {m:'E',ans:'LIBÉLULA',clue:'Insecto de alas transparentes que ronda el agua; alguacil, le dicen',d:2},
+ {m:'E',ans:'MANANTIAL',clue:'Agua pura que brota de la tierra',d:2},
+ {m:'E',ans:'NARDO',clue:'Flor blanca de perfume intenso',d:3},
+ {m:'C',ans:'GRUÑIDO',clue:'Sonido de enojo del perro',d:2},
+ {m:'E',ans:'OVNI',clue:'Objeto volador que nadie sabe qué es',d:2},
+ {m:'E',ans:'PAVADA',clue:'Tontería sin importancia',d:2},
+ {m:'E',ans:'QUÍMICO',clue:'Científico que trabaja con elementos y reacciones',d:2},
+ {m:'E',ans:'RAYO',clue:'Descarga eléctrica que baja del cielo y parte árboles',d:1},
+ {m:'E',ans:'SUPERMERCADO',clue:'Ahí hacés las compras con changuito',d:1},
+ {m:'E',ans:'TINAJA',clue:'Vasija grande de barro para guardar agua o vino',d:3},
+ {m:'C',ans:'BUZO',clue:'Abrigo deportivo con o sin capucha; también el que baja al fondo del mar',d:1},
+ {m:'E',ans:'VOLANTE',clue:'Con él manejás el auto; también papelito de publicidad',d:1},
+ {m:'E',ans:'XILÓFONO',clue:'Instrumento de tablitas que se golpean con palillos',d:2},
+ {m:'E',ans:'YUNGAS',clue:'Selva nublada de las laderas del norte argentino',d:3},
+ {m:'E',ans:'ZAR',clue:'Emperador de la Rusia de antes',d:3},
+]},
+{name:'Rosco 32',w:[
+ {m:'E',ans:'ARDILLA',clue:'Roedor de cola peluda que junta nueces',d:1},
+ {m:'E',ans:'BÚHO',clue:'Ave nocturna de ojos enormes, símbolo de sabiduría',d:1},
+ {m:'E',ans:'COCINERO',clue:'El que está detrás de las hornallas del restorán',d:1},
+ {m:'E',ans:'DURMIENTE',clue:'Madero atravesado bajo los rieles del tren',d:3},
+ {m:'E',ans:'ENSAYO',clue:'Práctica previa a la función; también el try del rugby',d:2},
+ {m:'E',ans:'FURGÓN',clue:'Vagón de carga del tren; también camioneta cerrada',d:3},
+ {m:'E',ans:'GIMNASIO',clue:'Ahí se levantan pesas; también club platense',d:1},
+ {m:'E',ans:'HORQUETA',clue:'Palo que se abre en dos, como el de la gomera',d:3},
+ {m:'E',ans:'INTEMPERIE',clue:'Quedarse afuera, sin techo ni reparo',d:3},
+ {m:'E',ans:'JABALÍ',clue:'Chancho salvaje de colmillos',d:1},
+ {m:'E',ans:'LAZO',clue:'Cuerda con nudo corredizo que el gaucho revolea',d:2},
+ {m:'E',ans:'MAPA',clue:'Dibujo de un territorio con sus rutas y ciudades',d:1},
+ {m:'E',ans:'NAVAJA',clue:'Cuchillo plegable de bolsillo',d:1},
+ {m:'C',ans:'ANTAÑO',clue:'En tiempos viejos, hace mucho',d:3},
+ {m:'E',ans:'ORÉGANO',clue:'Hierba seca que corona la pizza',d:1},
+ {m:'E',ans:'PIZARRÓN',clue:'Tablero verde o negro donde escribe la maestra',d:1},
+ {m:'E',ans:'QUINTAL',clue:'Medida rural de cien kilos',d:3},
+ {m:'E',ans:'RULETA',clue:'Rueda del casino con números rojos y negros',d:1},
+ {m:'E',ans:'SASTRE',clue:'Hace trajes a medida',d:2},
+ {m:'E',ans:'TAMBOR',clue:'Se golpea con palillos; suena en la murga',d:1},
+ {m:'C',ans:'CUMBIA',clue:'Ritmo tropical infaltable en todo casamiento',d:1},
+ {m:'E',ans:'VASIJA',clue:'Recipiente de cerámica de los pueblos originarios',d:3},
+ {m:'C',ans:'EXAGERACIÓN',clue:'Agrandar las cosas más de lo que son',d:3},
+ {m:'E',ans:'YERMO',clue:'Terreno baldío y estéril, donde no crece nada',d:3},
+ {m:'E',ans:'ZANCADA',clue:'Paso largo del que camina apurado',d:3},
+]},
+];
+/* Banco por letra: BANCO[i] = las 32 opciones para la letra LETTERS[i].
+   El sorteo es POR DUELO y en espejo: para cada letra se elige un nivel
+   (perfil ~12 fáciles, 9 medias, 4 difíciles) y se sacan DOS palabras
+   distintas de ese nivel, una para cada equipo. Así los dos roscos del
+   duelo quedan con idéntica dificultad letra por letra. Sin repetir
+   palabras dentro del torneo (T.used). */
+const BANCO=LETTERS.map((_,i)=>ROSCOS.map(r=>r.w[i]));
+function shuffleIdx(){ const a=LETTERS.map((_,i)=>i); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function drawDuel(){
+  const quota={1:12,2:9,3:4};
+  const wa=Array(LETTERS.length), wb=Array(LETTERS.length);
+  shuffleIdx().forEach(i=>{
+    const availFor=()=>{ const a={1:[],2:[],3:[]}; BANCO[i].forEach((w,k)=>{ if(!T.used[i].includes(k)) a[w.d||2].push(k); }); return a; };
+    let avail=availFor();
+    let tiers=[1,2,3].filter(t=>quota[t]>0&&avail[t].length>=2);
+    if(!tiers.length) tiers=[1,2,3].filter(t=>avail[t].length>=2);
+    if(!tiers.length){ T.used[i]=[]; avail=availFor(); tiers=[1,2,3].filter(t=>quota[t]>0&&avail[t].length>=2); if(!tiers.length) tiers=[1,2,3].filter(t=>avail[t].length>=2); } // reciclaje de emergencia
+    const pool=[]; tiers.forEach(t=>{ for(let r=0;r<Math.max(1,quota[t]);r++) pool.push(t); });
+    const t=pool[Math.floor(Math.random()*pool.length)];
+    const list=avail[t];
+    const p1=Math.floor(Math.random()*list.length);
+    let p2=Math.floor(Math.random()*(list.length-1)); if(p2>=p1)p2++;
+    const k1=list[p1], k2=list[p2];
+    if(quota[t]>0) quota[t]--;
+    T.used[i].push(k1,k2);
+    wa[i]=k1; wb[i]=k2;
+  });
+  return [wa,wb];
+}
+/* palabras de muerte súbita: primera respuesta a viva voz gana */
+const DESEMPATE=[
+ {ans:'PEBETE',clue:'Pan blandito y ovalado del sánguche de jamón y queso'},
+ {ans:'MERENGUE',clue:'Dulce de claras batidas que corona la torta'},
+ {ans:'CHURRASCO',clue:'Bife a la plancha de todos los días'},
+ {ans:'GLORIETA',clue:'Quiosco del medio de la plaza donde toca la banda'},
+ {ans:'CALESITA',clue:'Vueltas, caballitos y el premio de la sortija'},
+ {ans:'BALDE',clue:'Con la pala, infaltable en la playa'},
+ {ans:'CHANGUITO',clue:'Carrito del supermercado'},
+ {ans:'BUFANDA',clue:'Abriga el cuello en invierno'},
+ {ans:'TUTUCA',clue:'Maíz inflado dulce, golosina de cine de antes'},
+ {ans:'PAYASO',clue:'Hace reír en el circo con su nariz roja'},
+ {ans:'SARTÉN',clue:'En ella se fríen las milanesas'},
+ {ans:'BRÚJULA',clue:'Señala siempre el norte'},
+ {ans:'CANILLA',clue:'De ahí sale el agua en la cocina'},
+ {ans:'GOLOSINA',clue:'Caramelos, chupetines y chicles, en general'},
+ {ans:'ALMOHADA',clue:'Donde apoyás la cabeza para dormir'},
+];
+
+/* ---------- estado ---------- */
+let db=null, fbReady=false;
+(function(){ try{ if(FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('PEGÁ')){ firebase.initializeApp(FIREBASE_CONFIG); db=firebase.database(); fbReady=true; } }catch(e){ console.error('Firebase:',e); } })();
+
+let T=null;
+let clockIv=null, lastTick=0, bcastAt=0;
+let specRef=null, timePer=150, teamCount=4;
+const STORE='rosco_torneo';
+
+function save(){ try{ localStorage.setItem(STORE,JSON.stringify(T)); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(STORE)||'null'); }catch(e){ return null; } }
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.body.classList.toggle('stage-mode',id==='s-match'||id==='s-spec'||id==='s-champion');window.scrollTo(0,0);}
+function esc(s){return String(s).replace(/[&<>"\']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function makePin(){const L='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=L[Math.floor(Math.random()*L.length)];return s;}
+
+/* ---------- setup ---------- */
+function goSetup(){
+  document.getElementById('cfgWarn').innerHTML = fbReady?'' :
+    `<div class="config-warn"><b>Sin Firebase no hay modo espectador.</b> El torneo igual funciona en este teléfono. Para transmitir, pegá tu config en <code>FIREBASE_CONFIG</code>.</div>`;
+  renderCountOpts(); renderTeamInputs(); renderTimeOpts(); show('s-setup');
+}
+function renderCountOpts(){
+  document.getElementById('countOpts').innerHTML=[2,3,4,5,6,7,8,9,10,11,12].map(n=>
+    `<button class="chip ${teamCount===n?'active':''}" onclick="setCount(${n})">${n}</button>`).join('');
+  const duels=teamCount-1;
+  document.getElementById('countHint').textContent =
+    teamCount+' equipos → '+duels+' duelo'+(duels>1?'s':'')+' · roscos sorteados al azar'+(teamCount%2?' · con un "pasa directo" por ronda impar':'');
+}
+function setCount(n){
+  // conservar nombres ya tipeados
+  const vals=[]; document.querySelectorAll('#teamInputs input').forEach(i=>vals.push(i.value));
+  teamCount=n; renderCountOpts(); renderTeamInputs(vals);
+}
+function renderTeamInputs(vals){
+  vals=vals||[];
+  let h='';
+  for(let i=0;i<teamCount;i++) h+=`<input id="t${i}" placeholder="Equipo ${i+1}" maxlength="18" value="${esc(vals[i]||'')}" style="margin-top:9px">`;
+  document.getElementById('teamInputs').innerHTML=h;
+}
+function renderTimeOpts(){
+  document.getElementById('timeOpts').innerHTML=[120,150,180].map(n=>
+    `<button class="chip ${timePer===n?'active':''}" onclick="timePer=${n};renderTimeOpts()">${n} s</button>`).join('');
+}
+function createTournament(){
+  const teams=[]; for(let i=0;i<teamCount;i++) teams.push((document.getElementById('t'+i).value||'').trim()||('Equipo '+(i+1)));
+  T={teams,timePer,pin:fbReady?makePin():null,rounds:[],used:LETTERS.map(()=>[]),nextDes:0,champion:null,ms:null};
+  buildRound(teams.map((_,i)=>i));
+  save(); renderBracket(); show('s-bracket'); broadcast(true);
+}
+function confirmResetT(){ if(confirm('¿Borrar el torneo actual y empezar de cero?')){ stopClock(); if(fbReady&&T&&T.pin) db.ref('rooms/'+T.pin).remove(); T=null; try{localStorage.removeItem(STORE);}catch(e){} show('s-home'); } }
+
+/* ---------- llave dinámica ---------- */
+function buildRound(entrants){
+  const duels=[], byes=[];
+  for(let i=0;i<entrants.length;i+=2){
+    if(i+1<entrants.length) duels.push({a:entrants[i],b:entrants[i+1],winner:null,wa:null,wb:null});
+    else byes.push(entrants[i]);
+  }
+  T.rounds.push({entrants,duels,byes});
+}
+function roundLabel(ri){ const r=T.rounds[ri]; const n=r.entrants.length; return n<=2?'Final':n<=4?'Semifinales':'Ronda '+(ri+1); }
+function advanceIfReady(){
+  const r=T.rounds[T.rounds.length-1];
+  if(r.duels.some(d=>d.winner==null)) return;
+  const adv=r.byes.concat(r.duels.map(d=>d.winner)); // los libres primero, para que no zafen dos veces
+  if(adv.length===1){ T.champion=adv[0]; }
+  else buildRound(adv);
+}
+function renderBracket(){
+  const lp=document.getElementById('livePill');
+  lp.innerHTML = (fbReady&&T.pin) ? `<span class="live-pill"><span class="dot"></span> EN VIVO · PIN <b>&nbsp;${T.pin}</b>&nbsp;· link: ${esc(location.host+location.pathname)}#ver=${T.pin}</span>` : '';
+  const el=document.getElementById('bracket'); let h='';
+  if(T.champion!=null){
+    h+=`<div class="match-card" style="border-color:var(--sun-deep)"><div class="mlabel">Campeón</div>
+      <div class="vs"><span class="tn winner">🏆 ${esc(T.teams[T.champion])}</span></div>
+      <button class="btn btn-sun" onclick="show('s-champion')">Ver pantalla de campeón</button></div>`;
+    document.getElementById('champName').textContent=T.teams[T.champion];
+  }
+  T.rounds.forEach((r,ri)=>{
+    const isLast=(ri===T.rounds.length-1);
+    h+=`<div class="kick" style="margin:14px 0 8px">${roundLabel(ri)}</div>`;
+    r.duels.forEach((d,di)=>{
+      h+=`<div class="match-card">
+        <div class="mlabel">Duelo ${di+1}</div>
+        <div class="vs">
+          <span class="tn ${d.winner===d.a?'winner':''}">${esc(T.teams[d.a])}</span>
+          <span class="vsx">VS</span>
+          <span class="tn ${d.winner===d.b?'winner':''}" style="text-align:right">${esc(T.teams[d.b])}</span>
+        </div>
+        ${d.winner!=null?`<div style="margin-top:8px;font-size:14px;color:var(--good);font-weight:700">Ganó ${esc(T.teams[d.winner])} ✔</div>`
+          : (isLast&&T.champion==null?`<button class="btn btn-sun" onclick="startMatch(${ri},${di})">${T.ms&&T.ms.r===ri&&T.ms.d===di?'Continuar duelo':'Jugar'}</button>`:'')}
+      </div>`;
+    });
+    r.byes.forEach(b=>{
+      h+=`<div class="match-card" style="opacity:.8"><div class="mlabel">Pasa directo</div>
+        <div class="vs"><span class="tn">${esc(T.teams[b])} 🎟️</span></div></div>`;
+    });
+  });
+  el.innerHTML=h;
+}
+
+/* ---------- partido ---------- */
+function freshSide(teamIdx,wIdxs){ return {t:teamIdx,w:wIdxs,st:Array(LETTERS.length).fill(0),ptr:0,time:T.timePer}; }
+function startMatch(ri,di){
+  const d=T.rounds[ri].duels[di];
+  if(d.wa==null){ const pair=drawDuel(); d.wa=pair[0]; d.wb=pair[1]; } // sorteo en espejo: misma dificultad letra por letra
+  if(!(T.ms&&T.ms.r===ri&&T.ms.d===di)){
+    T.ms={r:ri,d:di,sides:[freshSide(d.a,d.wa),freshSide(d.b,d.wb)],a:0,run:false,done:false,winner:null};
+  } else { T.ms.run=false; }
+  save(); renderMatch(); show('s-match'); broadcast(true);
+}
+function curSide(){ return T.ms.sides[T.ms.a]; }
+function isPend(x){ return x===0||x===3; } /* 0 = sin tocar · 3 = pasada (amarilla) */
+function hasPending(s){ return s.st.some(isPend); }
+function alive(s){ return s.time>0 && hasPending(s); }
+function nextPendingFrom(s,from){
+  for(let k=0;k<LETTERS.length;k++){ const i=((from%LETTERS.length)+LETTERS.length+k)%LETTERS.length; if(isPend(s.st[i])) return i; }
+  return -1;
+}
+function judge(kind){
+  if(!T||!T.ms||T.ms.done) return;
+  const s=curSide(); const i=s.ptr;
+  if(i<0||!isPend(s.st[i])){ const nx=nextPendingFrom(s,0); if(nx===-1){switchOrEnd();}else{s.ptr=nx;} save(); renderMatch(); return; }
+  if(kind==='ok'){
+    s.st[i]=1;                       // verde: sigue el mismo equipo, el reloj no se toca
+    const nx=nextPendingFrom(s,i+1);
+    if(nx===-1 || !alive(s)){ s.ptr=nx; switchOrEnd(); holdClock(); }
+    else s.ptr=nx;
+  }else if(kind==='bad'){
+    s.st[i]=2;                       // rojo: turno al rival, reloj detenido
+    s.ptr=nextPendingFrom(s,i+1);
+    switchOrEnd(); holdClock();
+  }else{ // pasapalabra
+    s.st[i]=3;                       // amarillo: turno al rival, reloj detenido
+    const nx=nextPendingFrom(s,i+1);
+    s.ptr=(nx===-1)?i:nx;
+    switchOrEnd(); holdClock();
+  }
+  if(T.ms&&!T.ms.done){ save(); renderMatch(); broadcast(true); }
+}
+function holdClock(){ if(T.ms&&!T.ms.done){ T.ms.run=false; stopClock(); } }
+function switchOrEnd(){
+  const o=1-T.ms.a;
+  const other=T.ms.sides[o], mine=T.ms.sides[T.ms.a];
+  if(alive(other)) T.ms.a=o;
+  else if(!alive(mine)) { endMatch(); }
+}
+function score(s){ return {g:s.st.filter(x=>x===1).length,b:s.st.filter(x=>x===2).length,t:Math.max(0,Math.round(s.time))}; }
+function endMatch(){
+  stopClock();
+  const ms=T.ms; ms.done=true; ms.run=false;
+  const A=score(ms.sides[0]), B=score(ms.sides[1]);
+  let w;
+  if(A.g!==B.g) w=A.g>B.g?0:1;
+  else if(A.b!==B.b) w=A.b<B.b?0:1;
+  else if(A.t!==B.t) w=A.t>B.t?0:1;
+  else w=null; // igualdad perfecta → muerte súbita
+  ms.winner=w;
+  renderMatchEnd(A,B,w);
+  if(w!=null){ finishDuel(ms.sides[w].t); }
+  else { document.getElementById('tiebreak').style.display='block'; document.getElementById('contBtn').style.display='none'; renderTiebreak(); }
+  save(); broadcast(true); show('s-matchend');
+}
+function finishDuel(teamIdx){
+  const ms=T.ms;
+  T.rounds[ms.r].duels[ms.d].winner=teamIdx;
+  T.ms=null;
+  advanceIfReady();
+  document.getElementById('tiebreak').style.display='none';
+  document.getElementById('contBtn').style.display='block';
+  save(); broadcast(true);
+}
+function renderMatchEnd(A,B,w){
+  const ms=T.ms; const sides=ms.sides;
+  document.getElementById('meLabel').textContent=roundLabel(ms.r);
+  document.getElementById('meTitle').textContent= w!=null ? ('Ganó '+T.teams[sides[w].t]) : 'Empate total';
+  const row=(s,sc,win)=>`<div class="res-row ${win?'win':''}"><span class="nm">${esc(T.teams[s.t])}</span><span class="nums" style="color:var(--good)">✔ ${sc.g}</span><span class="nums" style="color:var(--bad)">✖ ${sc.b}</span><span class="nums">⏱ ${sc.t}s</span></div>`;
+  document.getElementById('meRows').innerHTML=row(sides[0],A,w===0)+row(sides[1],B,w===1);
+  document.getElementById('tbA').textContent='Ganó '+T.teams[sides[0].t];
+  document.getElementById('tbB').textContent='Ganó '+T.teams[sides[1].t];
+}
+function renderTiebreak(){
+  const w=DESEMPATE[T.nextDes%DESEMPATE.length];
+  document.getElementById('tbClue').textContent=w.clue;
+  document.getElementById('tbAns').textContent=w.ans;
+}
+function nextTiebreak(){ T.nextDes++; save(); renderTiebreak(); }
+function tieWin(side){
+  if(!T.ms) return;
+  T.nextDes++;
+  const teamIdx=T.ms.sides[side].t;
+  document.getElementById('meTitle').textContent='Ganó '+T.teams[teamIdx];
+  finishDuel(teamIdx);
+}
+function contAfterMatch(){
+  if(T.champion!=null){ document.getElementById('champName').textContent=T.teams[T.champion]; show('s-champion'); }
+  else { renderBracket(); show('s-bracket'); }
+}
+function backToBracket(){ if(T.ms&&!T.ms.done){ T.ms.run=false; stopClock(); save(); broadcast(true);} renderBracket(); show('s-bracket'); }
+function togglePause(){ if(!T||!T.ms||T.ms.done)return; T.ms.run=!T.ms.run; if(T.ms.run){startClock();}else{stopClock();} renderTimeBtn(); save(); broadcast(true); }
+function renderTimeBtn(){
+  const b=document.getElementById('pauseBtn'); if(!T||!T.ms) return;
+  if(T.ms.run){ b.className='btn btn-ghost'; b.textContent='⏸ Pausar'; }
+  else { b.className='btn btn-sun'; b.textContent='▶ Arrancar tiempo'; }
+}
+
+/* ---------- reloj ---------- */
+function startClock(){ stopClock(); lastTick=Date.now(); clockIv=setInterval(tick,200); }
+function stopClock(){ if(clockIv){clearInterval(clockIv);clockIv=null;} }
+function tick(){
+  if(!T||!T.ms||T.ms.done||!T.ms.run) return;
+  const now=Date.now(); const dt=Math.min(2,(now-lastTick)/1000); lastTick=now;
+  const s=curSide(); s.time-=dt;
+  if(s.time<=0){
+    s.time=0;
+    const o=1-T.ms.a;
+    if(alive(T.ms.sides[o])){ T.ms.a=o; holdClock(); save(); renderMatch(); broadcast(true); }
+    else { endMatch(); return; }
+  }
+  renderClocks();
+  if(now-bcastAt>1500){ broadcast(false); }
+}
+
+/* ---------- render partido ---------- */
+function ringSVG(s){
+  const R=150, cx=180, cy=180, rr=17;
+  let h='';
+  LETTERS.forEach((L,i)=>{
+    const a=-Math.PI/2 + i*2*Math.PI/LETTERS.length;
+    const x=cx+Math.cos(a)*R, y=cy+Math.sin(a)*R;
+    const st=s.st[i];
+    const cls = (i===s.ptr&&isPend(st))?'cur' : st===1?'ok' : st===2?'bad' : st===3?'pass':'pend';
+    h+=`<g class="rl ${cls}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr}"/><text x="${x.toFixed(1)}" y="${(y+6).toFixed(1)}" text-anchor="middle">${L}</text></g>`;
+  });
+  return h;
+}
+const DLBL={1:'Fácil',2:'Media',3:'Difícil'};
+function renderMatch(){
+  if(!T||!T.ms||T.ms.done) return;
+  const ms=T.ms, s=curSide();
+  document.getElementById('mLabel').textContent=roundLabel(ms.r)+' · turno de '+T.teams[s.t];
+  document.getElementById('ring').innerHTML=ringSVG(s);
+  if(s.ptr>=0 && isPend(s.st[s.ptr])){
+    const w=BANCO[s.ptr][s.w[s.ptr]]; const L=LETTERS[s.ptr];
+    document.getElementById('cLetter').textContent=L;
+    document.getElementById('cMode').textContent=(w.m==='E'?'Empieza con ':'Contiene la ')+L+(w.d?' · '+DLBL[w.d]:'');
+    document.getElementById('cText').textContent=w.clue;
+    document.getElementById('cAns').textContent=w.ans;
+  }
+  renderClocks();
+  renderTimeBtn();
+}
+function renderClocks(){
+  if(!T||!T.ms) return;
+  const ms=T.ms;
+  document.getElementById('scorestrip').innerHTML=ms.sides.map((s,i)=>{
+    const g=s.st.filter(x=>x===1).length, b=s.st.filter(x=>x===2).length;
+    const warn=s.time<=20?'clockwarn':'';
+    return `<div class="sidechip ${i===ms.a?'on':''} ${warn}"><span class="nm">${esc(T.teams[s.t])}</span><span class="g">✔${g}</span><span class="b">✖${b}</span><span class="tm">${Math.ceil(Math.max(0,s.time))}</span></div>`;
+  }).join('');
+}
+
+/* ---------- transmisión ---------- */
+function broadcast(force){
+  if(!fbReady||!T||!T.pin) return;
+  if(!force && Date.now()-bcastAt<1200) return;
+  bcastAt=Date.now();
+  let payload={type:'rosco',teams:T.teams,label:'Llave del torneo',clue:null,sides:null,a:0,run:false,done:false,winnerName:null,ts:Date.now()};
+  if(T.ms){
+    const ms=T.ms; const s=ms.sides[ms.a];
+    payload.label=roundLabel(ms.r);
+    payload.a=ms.a; payload.run=ms.run; payload.done=ms.done;
+    payload.sides=ms.sides.map(x=>({name:T.teams[x.t],st:x.st.join(''),ptr:x.ptr,time:Math.ceil(Math.max(0,x.time))}));
+    if(!ms.done && s.ptr>=0 && isPend(s.st[s.ptr])){
+      const w=BANCO[s.ptr][s.w[s.ptr]];
+      payload.clue={l:LETTERS[s.ptr],m:w.m,text:w.clue}; // sin la respuesta
+    }
+    if(ms.done&&ms.winner!=null) payload.winnerName=T.teams[ms.sides[ms.winner].t];
+  } else if(T.champion!=null){ payload.label='Torneo terminado'; payload.winnerName=T.teams[T.champion]; }
+  db.ref('rooms/'+T.pin).set(payload);
+}
+
+/* ---------- espectador ---------- */
+function goSpec(){ show('s-specjoin'); }
+function joinSpec(){
+  const err=document.getElementById('specErr'); err.style.display='none';
+  if(!fbReady){ err.textContent='Este sitio no tiene Firebase configurado.'; err.style.display='block'; return; }
+  const p=(document.getElementById('pinInput').value||'').trim().toUpperCase();
+  if(p.length<4){ err.textContent='El PIN tiene 4 caracteres.'; err.style.display='block'; return; }
+  db.ref('rooms/'+p).once('value',snap=>{
+    if(!snap.exists()||snap.val().type!=='rosco'){ err.textContent='No hay una transmisión con ese PIN.'; err.style.display='block'; return; }
+    specRef=db.ref('rooms/'+p);
+    specRef.on('value',ss=>{ const d=ss.val(); if(!d){ leaveSpec(); return; } renderSpec(d); });
+    show('s-spec');
+  });
+}
+function leaveSpec(){ if(specRef){specRef.off();specRef=null;} show('s-home'); }
+function specRing(stStr,ptr,active){
+  const s={st:stStr.split('').map(Number),ptr:active?ptr:-1};
+  return `<svg viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg">${ringSVG(s)}</svg>`;
+}
+function renderSpec(d){
+  document.getElementById('spLabel').textContent=(d.label||'El Rosco Argentino')+(d.sides&&!d.run&&!d.winnerName?' · reloj detenido':'');
+  const clue=document.getElementById('spClue');
+  if(d.winnerName){ clue.innerHTML=`<b>🏆 Ganó ${esc(d.winnerName)}</b>`; }
+  else if(d.clue){ clue.innerHTML=`<span class="cmode">${d.clue.m==='E'?'Empieza con ':'Contiene la '}${esc(d.clue.l)}</span><div class="ctext">${esc(d.clue.text)}</div>`; }
+  else clue.textContent= d.sides?'Partido en pausa…':'Esperando que arranque el partido…';
+  const g=document.getElementById('spGrid');
+  if(!d.sides){ g.innerHTML=''; return; }
+  g.innerHTML=d.sides.map((s,i)=>{
+    const greens=(s.st.match(/1/g)||[]).length, reds=(s.st.match(/2/g)||[]).length;
+    return `<div class="spec-side ${i===d.a&&d.run?'on':''}">
+      <div class="hd"><span>${esc(s.name)}</span><span style="color:var(--good)">✔${greens}</span><span style="color:var(--bad)">✖${reds}</span><span class="tm">${s.time}</span></div>
+      ${specRing(s.st,s.ptr,i===d.a)}
+    </div>`;
+  }).join('');
+}
+
+/* ---------- arranque ---------- */
+(function(){
+  const m=location.hash.match(/ver=([A-Za-z0-9]{4})/);
+  if(m&&fbReady){ document.getElementById('pinInput').value=m[1].toUpperCase(); show('s-specjoin'); return; }
+  const saved=load();
+  if(saved&&saved.teams&&saved.rounds&&saved.used){
+    T=saved;
+    if(T.ms&&!T.ms.done){ T.ms.run=false; renderMatch(); show('s-match'); }
+    else { renderBracket(); show('s-bracket'); }
+  }
+})();
+</script>
+</body>
+</html>
