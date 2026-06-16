@@ -117,6 +117,11 @@
   .spec-clue{background:#fff;color:var(--navy);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow)}
   #pinInput{letter-spacing:.4em;text-transform:uppercase;font-family:'Anton',sans-serif;font-size:28px;text-align:center}
   .footer-note{text-align:center;color:var(--muted);font-size:12.5px;margin-top:14px}
+  .rule{font-size:14.5px;line-height:1.5;color:var(--navy);margin:0 0 9px}
+  .rule b{font-weight:700}
+  .rule .dot{display:inline-block;width:22px;text-align:center;font-weight:800;margin-right:2px}
+  .rule .dot.good{color:var(--good)} .rule .dot.bad{color:var(--bad)} .rule .dot.pass{color:var(--celeste-deep)}
+  #s-rules .card{max-height:none}
   body.stage-mode .footer-note{color:var(--muted-l)}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -129,13 +134,43 @@
     <div class="brand center">
       <div class="kick">Pasapalabra criollo · por equipos</div>
       <h1><span class="el">EL ROSCO</span><br><span class="ro">ARGENTINO</span></h1>
-      <p class="tagline">De 2 a 8 equipos en eliminación directa. Cada equipo con su propio rosco de 25 letras y su reloj. El moderador lee, el equipo canta la respuesta.</p>
+      <p class="tagline">De 2 a 12 equipos en eliminación directa. Cada equipo con su propio rosco de 25 letras y su reloj. El moderador lee, el equipo canta la respuesta.</p>
     </div>
     <div class="stack">
       <button class="btn btn-sun" onclick="goSetup()">Soy el moderador · armar torneo</button>
       <button class="btn btn-ghost" onclick="goSpec()">Ver en vivo (espectador)</button>
+      <button class="btn btn-ghost" onclick="show('s-rules')">📖 Cómo se juega</button>
     </div>
     <p class="footer-note">Banco de 800 palabras · roscos al azar · hasta 12 equipos</p>
+  </section>
+
+  <!-- REGLAS -->
+  <section id="s-rules" class="screen">
+    <div class="brand"><div class="kick">Reglamento</div><h1 style="font-size:clamp(28px,8vw,46px)">Cómo se juega</h1></div>
+    <div class="card" style="text-align:left">
+      <h2 class="section-title">La idea</h2>
+      <p class="rule">Es un <b>Pasapalabra por equipos</b>. Cada equipo tiene su propio rosco de 25 letras (de la A a la Z, con Ñ). El moderador lee la definición en voz alta y el equipo <b>canta la respuesta</b>; el moderador marca si estuvo bien o mal. Cada equipo corre contra su propio reloj.</p>
+
+      <h2 class="section-title" style="margin-top:18px">Cada letra</h2>
+      <p class="rule"><span class="dot good">✔</span> <b>Correcta:</b> la letra se pinta verde, sigue el <b>mismo equipo</b> y el reloj <b>no se detiene</b> (encadena aciertos contra reloj).</p>
+      <p class="rule"><span class="dot pass">⟳</span> <b>Pasapalabra:</b> la letra queda amarilla, pasa el turno al <b>otro equipo</b> y el reloj <b>se frena</b> hasta que el moderador lo arranca. La letra pasada se puede contestar cuando la rueda vuelva a ella.</p>
+      <p class="rule"><span class="dot bad">✖</span> <b>Error:</b> la letra se pinta roja, pasa el turno al rival y el reloj <b>se frena</b> igual que en el pasapalabra.</p>
+
+      <h2 class="section-title" style="margin-top:18px">Quién gana el duelo</h2>
+      <p class="rule">El partido termina cuando ambos equipos completan su rosco o se quedan sin tiempo. Gana, en este orden:</p>
+      <p class="rule">1. El que tiene <b>más aciertos</b> (verdes).<br>2. Si empatan, el que tiene <b>menos errores</b> (rojas).<br>3. Si siguen iguales, el que <b>conservó más tiempo</b>.<br>4. Si es empate perfecto → <b>muerte súbita ⚡</b>: una palabra suelta, gana el primero que la canta.</p>
+
+      <h2 class="section-title" style="margin-top:18px">El torneo</h2>
+      <p class="rule">Es por <b>eliminación directa</b>: el que gana avanza, el que pierde queda afuera. Ronda tras ronda hasta la final; el ganador de la final es el <b>campeón 🏆</b>. Con N equipos se juegan N−1 duelos.</p>
+      <p class="rule">Si los equipos son <b>número impar</b>, uno <b>pasa directo 🎟️</b> a la ronda siguiente (y juega primero allí, para que nadie zafe dos veces).</p>
+
+      <h2 class="section-title" style="margin-top:18px">Las palabras</h2>
+      <p class="rule">Hay un banco de <b>800 palabras</b> y cada rosco se <b>sortea al azar</b>: nunca se repiten dentro de un mismo torneo, y los dos roscos de un duelo tienen <b>la misma dificultad letra por letra</b>, para que sea parejo. El moderador ve el nivel de cada definición (Fácil / Media / Difícil).</p>
+
+      <h2 class="section-title" style="margin-top:18px">Para verlo en la tele</h2>
+      <p class="rule">El celular del moderador es privado (muestra las respuestas). Para proyectar, usá <b>otro dispositivo</b> en "Ver en vivo": muestra los roscos y los relojes <b>sin las respuestas</b>. Ese es el que conectás a la tele.</p>
+    </div>
+    <div class="stack"><button class="btn btn-ghost" onclick="show('s-home')">Volver</button></div>
   </section>
 
   <!-- SETUP -->
