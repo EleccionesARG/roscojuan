@@ -170,7 +170,37 @@
       <h2 class="section-title" style="margin-top:18px">Para verlo en la tele</h2>
       <p class="rule">El celular del moderador es privado (muestra las respuestas). Para proyectar, usá <b>otro dispositivo</b> en "Ver en vivo": muestra los roscos y los relojes <b>sin las respuestas</b>. Ese es el que conectás a la tele.</p>
     </div>
-    <div class="stack"><button class="btn btn-ghost" onclick="show('s-home')">Volver</button></div>
+    <div class="stack">
+      <button class="btn btn-sun" onclick="demoStart()">▶ Ver un ejemplo de cómo se juega</button>
+      <button class="btn btn-ghost" onclick="show('s-home')">Volver</button>
+    </div>
+  </section>
+
+  <!-- EJEMPLO / DEMO -->
+  <section id="s-demo" class="screen">
+    <div class="kick" style="text-align:center;margin-bottom:6px">Ejemplo · así es la dinámica</div>
+    <div class="scorestrip" id="demoStrip"></div>
+    <div class="ringbox"><svg id="demoRing" viewBox="0 0 360 124" xmlns="http://www.w3.org/2000/svg"></svg></div>
+    <div class="cluecard">
+      <div class="top">
+        <div class="bigletter" id="demoLetter">A</div>
+        <div style="min-width:0">
+          <div class="cmode" id="demoMode">Empieza con A</div>
+          <div class="ctext" id="demoText">—</div>
+        </div>
+      </div>
+      <div class="cans">Respuesta (la ve solo el moderador): <b id="demoAns">—</b></div>
+      <div class="judges">
+        <button class="judge j-ok" id="demoOk" onclick="demoJudge('ok')">✔ Correcta</button>
+        <button class="judge j-pass" id="demoPass" onclick="demoJudge('pass')">⟳ Pasa</button>
+        <button class="judge j-bad" id="demoBad" onclick="demoJudge('bad')">✖ Error</button>
+      </div>
+    </div>
+    <div id="demoMsg" style="background:#10325a;border:1.5px solid var(--line-dark);border-radius:14px;padding:13px 15px;margin-top:11px;font-size:14.5px;line-height:1.5;min-height:54px;color:#fff"></div>
+    <div class="matchctl">
+      <button class="btn btn-ghost" onclick="demoStart()">↻ Reiniciar ejemplo</button>
+      <button class="btn btn-sun" onclick="show('s-rules')">Entendido</button>
+    </div>
   </section>
 
   <!-- SETUP -->
@@ -444,7 +474,7 @@ const ROSCOS=[
 ]},
 {name:'Final · Rosco dorado',w:[
  {m:'E',ans:'ALJIBE',clue:'Pozo de agua de las casas coloniales',d:3},
- {m:'E',ans:'BAGUAL',clue:'Caballo salvaje, todavía sin domar',d:3},
+ {m:'E',ans:'BIFE',clue:'Corte de carne a la plancha; el de chorizo es el más pedido',d:1},
  {m:'E',ans:'CHAMAMÉ',clue:'Música litoraleña que se baila abrazado, con acordeón',d:2},
  {m:'E',ans:'DOMA',clue:'Destreza criolla de amansar caballos',d:2},
  {m:'E',ans:'ESTRIBO',clue:'Ahí apoya el pie el jinete; la última copa es la del…',d:2},
@@ -460,7 +490,7 @@ const ROSCOS=[
  {m:'E',ans:'OCHAVA',clue:'Esquina cortada en diagonal de las manzanas porteñas',d:3},
  {m:'E',ans:'PULPERÍA',clue:'Almacén, bar y club social del campo del 1800',d:3},
  {m:'E',ans:'QUENA',clue:'Flauta andina de caña',d:3},
- {m:'E',ans:'RASTRA',clue:'Cinturón gaucho adornado con monedas',d:3},
+ {m:'E',ans:'REGALO',clue:'Viene envuelto y con moño; lo abrís en tu cumpleaños',d:1},
  {m:'E',ans:'SORRENTINOS',clue:'Pasta rellena redonda inventada en Mar del Plata',d:2},
  {m:'E',ans:'TROPILLA',clue:'Conjunto de caballos que andan juntos',d:2},
  {m:'E',ans:'UTOPÍA',clue:'Lugar ideal que no existe en ninguna parte',d:3},
@@ -578,7 +608,7 @@ const ROSCOS=[
  {m:'E',ans:'ZAPATO',clue:'Calzado elegante que se lustra',d:1},
 ]},
 {name:'Rosco 11',w:[
- {m:'E',ans:'APERO',clue:'Conjunto de monturas y arreos del caballo',d:3},
+ {m:'E',ans:'ABEJA',clue:'Insecto que fabrica la miel en la colmena',d:1},
  {m:'E',ans:'BOTINES',clue:'Calzado con tapones para jugar al fútbol',d:1},
  {m:'E',ans:'COMPARSA',clue:'Grupo que desfila en el carnaval, como en Gualeguaychú',d:2},
  {m:'E',ans:'DESEMPATE',clue:'Lo que define un partido igualado',d:1},
@@ -1034,7 +1064,7 @@ const ROSCOS=[
  {m:'E',ans:'VILLANCICO',clue:'Canción navideña',d:2},
  {m:'C',ans:'EXPERIMENTO',clue:'Prueba científica de laboratorio',d:2},
  {m:'E',ans:'YUGO',clue:'Madero que une a los bueyes; también una opresión',d:2},
- {m:'E',ans:'ZARZUELA',clue:'Teatro musical español; también guiso de mariscos',d:3},
+ {m:'E',ans:'ZODÍACO',clue:'Los doce signos astrológicos, de Aries a Piscis',d:2},
 ]},
 {name:'Rosco 28',w:[
  {m:'E',ans:'ALAMBRE',clue:'Hilo de metal de los cercos del campo',d:2},
@@ -1099,7 +1129,7 @@ const ROSCOS=[
  {m:'E',ans:'FARMACIA',clue:'Negocio de remedios con cruz verde',d:1},
  {m:'E',ans:'GORRIÓN',clue:'Pajarito marrón de todas las plazas',d:1},
  {m:'E',ans:'HUELLA',clue:'Marca que dejan los pies; también canción criolla',d:1},
- {m:'E',ans:'IRUPÉ',clue:'Planta acuática gigante y redonda de los esteros',d:3},
+ {m:'E',ans:'INVITADO',clue:'El que viene a festejar a tu cumpleaños',d:1},
  {m:'E',ans:'JUVENTUD',clue:'Etapa de la vida entre la niñez y la adultez',d:1},
  {m:'E',ans:'LANGOSTA',clue:'Marisco de lujo; también insecto que arrasa cosechas',d:2},
  {m:'E',ans:'MULITA',clue:'Armadillo chiquito de la pampa',d:2},
@@ -1141,7 +1171,7 @@ const ROSCOS=[
  {m:'C',ans:'BUZO',clue:'Abrigo deportivo con o sin capucha; también el que baja al fondo del mar',d:1},
  {m:'E',ans:'VOLANTE',clue:'Con él manejás el auto; también papelito de publicidad',d:1},
  {m:'E',ans:'XILÓFONO',clue:'Instrumento de tablitas que se golpean con palillos',d:2},
- {m:'E',ans:'YUNGAS',clue:'Selva nublada de las laderas del norte argentino',d:3},
+ {m:'E',ans:'YUTE',clue:'Fibra vegetal con la que se hacen las bolsas de arpillera',d:2},
  {m:'E',ans:'ZAR',clue:'Emperador de la Rusia de antes',d:3},
 ]},
 {name:'Rosco 32',w:[
@@ -1231,7 +1261,7 @@ const STORE='rosco_torneo';
 
 function save(){ try{ localStorage.setItem(STORE,JSON.stringify(T)); }catch(e){} }
 function load(){ try{ return JSON.parse(localStorage.getItem(STORE)||'null'); }catch(e){ return null; } }
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.body.classList.toggle('stage-mode',id==='s-match'||id==='s-spec'||id==='s-champion');window.scrollTo(0,0);}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.body.classList.toggle('stage-mode',id==='s-match'||id==='s-spec'||id==='s-champion'||id==='s-demo');window.scrollTo(0,0);}
 function esc(s){return String(s).replace(/[&<>"\']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function makePin(){const L='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=L[Math.floor(Math.random()*L.length)];return s;}
 
@@ -1536,6 +1566,69 @@ function renderSpec(d){
       ${specRing(s.st,s.ptr,i===d.a)}
     </div>`;
   }).join('');
+}
+
+/* ---------- ejemplo / demo (no toca el banco ni el torneo) ---------- */
+const DEMO_W=[
+  {l:'A',ans:'ASADO',clue:'Carne a las brasas, el rey del domingo'},
+  {l:'B',ans:'BARCO',clue:'Embarcación grande que cruza el mar'},
+  {l:'C',ans:'CANCHA',clue:'Donde se juega al fútbol'},
+  {l:'D',ans:'DULCE',clue:'El de leche es el más argentino de todos'},
+  {l:'E',ans:'EMPANADA',clue:'Tapa rellena al horno; salteña o tucumana'},
+];
+let DEMO=null;
+function demoPend(x){return x===0||x===3;}
+function demoNext(from){for(let k=0;k<DEMO_W.length;k++){const i=((from%DEMO_W.length)+DEMO_W.length+k)%DEMO_W.length;if(demoPend(DEMO.st[i]))return i;}return -1;}
+function demoStart(){
+  DEMO={st:DEMO_W.map(()=>0),ptr:0,turn:0,run:true,done:false,names:['Equipo 1','Equipo 2']};
+  document.getElementById('demoMsg').innerHTML='Arranca el <b>Equipo 1</b> con el reloj corriendo. Tocá los tres botones para ver qué pasa con cada letra.';
+  demoRender(); show('s-demo');
+}
+function demoRingSVG(){
+  const n=DEMO_W.length, gap=66, x0=180-((n-1)*gap)/2, cy=58, rr=26;
+  let h='';
+  DEMO_W.forEach((w,i)=>{
+    const x=x0+i*gap, st=DEMO.st[i];
+    const cls=(i===DEMO.ptr&&demoPend(st))?'cur':st===1?'ok':st===2?'bad':st===3?'pass':'pend';
+    h+=`<g class="rl ${cls}"><circle cx="${x}" cy="${cy}" r="${rr}"/><text x="${x}" y="${cy+7}" text-anchor="middle">${w.l}</text></g>`;
+  });
+  return h;
+}
+function demoRender(){
+  document.getElementById('demoStrip').innerHTML=DEMO.names.map((nm,i)=>
+    `<div class="sidechip ${i===DEMO.turn?'on':''}"><span class="nm">${nm}</span><span class="tm">${(DEMO.run&&i===DEMO.turn)?'▶':'⏸'}</span></div>`).join('');
+  document.getElementById('demoRing').innerHTML=demoRingSVG();
+  const p=DEMO.ptr;
+  if(p>=0&&demoPend(DEMO.st[p])){
+    const w=DEMO_W[p];
+    document.getElementById('demoLetter').textContent=w.l;
+    document.getElementById('demoMode').textContent='Empieza con '+w.l;
+    document.getElementById('demoText').textContent=w.clue;
+    document.getElementById('demoAns').textContent=w.ans;
+  }
+  ['demoOk','demoPass','demoBad'].forEach(id=>document.getElementById(id).disabled=DEMO.done);
+}
+function demoJudge(kind){
+  if(!DEMO||DEMO.done)return;
+  const i=DEMO.ptr; if(i<0||!demoPend(DEMO.st[i]))return;
+  const w=DEMO_W[i]; let msg='';
+  if(kind==='ok'){
+    DEMO.st[i]=1; DEMO.run=true; DEMO.ptr=demoNext(i+1);
+    msg=`<b style="color:var(--good)">✔ ${w.ans}.</b> Acierto: la letra queda <b>verde</b>, sigue el <b>mismo equipo</b> y el reloj <b>no se frena</b> (encadena aciertos contra reloj).`;
+  }else if(kind==='pass'){
+    DEMO.st[i]=3; DEMO.turn=1-DEMO.turn; DEMO.run=false;
+    const nx=demoNext(i+1); DEMO.ptr=(nx===-1)?i:nx;
+    msg=`<b style="color:var(--celeste)">⟳ Pasapalabra.</b> La <b>${w.l}</b> queda <b>amarilla</b>, pasa el turno al <b>${DEMO.names[DEMO.turn]}</b> y el reloj <b>se frena</b>. Esa letra <b>vuelve</b> al completar la vuelta.`;
+  }else{
+    DEMO.st[i]=2; DEMO.turn=1-DEMO.turn; DEMO.run=false; DEMO.ptr=demoNext(i+1);
+    msg=`<b style="color:var(--bad)">✖ Error</b> (era <b>${w.ans}</b>). La letra queda <b>roja</b>, pasa el turno al <b>${DEMO.names[DEMO.turn]}</b> y el reloj <b>se frena</b>.`;
+  }
+  if(DEMO.st.every(x=>x===1||x===2)){
+    DEMO.done=true;
+    msg+=`<br><br><b>¡Eso es todo!</b> ✔ verde sigue y el reloj corre · ⟳ amarilla pasa y frena · ✖ roja pasa y frena. En el torneo real cada equipo tiene su propio rosco de 25 letras y su propio reloj.`;
+  }
+  document.getElementById('demoMsg').innerHTML=msg;
+  demoRender();
 }
 
 /* ---------- arranque ---------- */
