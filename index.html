@@ -253,6 +253,7 @@
       </div>
     </div>
     <div class="matchctl">
+      <button class="btn btn-ghost" id="undoBtn" onclick="undoMove()">↶ Deshacer</button>
       <button class="btn btn-ghost" id="pauseBtn" onclick="togglePause()">⏸ Pausar</button>
       <button class="btn btn-ghost" onclick="backToBracket()">Llave</button>
     </div>
@@ -279,7 +280,10 @@
         </div>
       </div>
     </div>
-    <div class="stack"><button class="btn btn-sun" id="contBtn" onclick="contAfterMatch()">Seguir con el torneo</button></div>
+    <div class="stack">
+      <button class="btn btn-ghost" onclick="undoMove()">↶ Deshacer última jugada</button>
+      <button class="btn btn-sun" id="contBtn" onclick="contAfterMatch()">Seguir con el torneo</button>
+    </div>
   </section>
 
   <!-- CAMPEÓN -->
@@ -1354,6 +1358,7 @@ function renderBracket(){
 /* ---------- partido ---------- */
 function freshSide(teamIdx,wIdxs){ return {t:teamIdx,w:wIdxs,st:Array(LETTERS.length).fill(0),ptr:0,time:T.timePer}; }
 function startMatch(ri,di){
+  undoStack=[];                        // arranca/continúa el duelo sin historial viejo
   const d=T.rounds[ri].duels[di];
   if(d.wa==null){ const pair=drawDuel(); d.wa=pair[0]; d.wb=pair[1]; } // sorteo en espejo: misma dificultad letra por letra
   if(!(T.ms&&T.ms.r===ri&&T.ms.d===di)){
@@ -1369,10 +1374,26 @@ function nextPendingFrom(s,from){
   for(let k=0;k<LETTERS.length;k++){ const i=((from%LETTERS.length)+LETTERS.length+k)%LETTERS.length; if(isPend(s.st[i])) return i; }
   return -1;
 }
+/* ---------- deshacer: corregir errores de marcación del moderador ---------- */
+let undoStack=[];
+function pushUndo(){ try{ undoStack.push(JSON.stringify(T)); if(undoStack.length>40) undoStack.shift(); }catch(e){} }
+function undoMove(){
+  if(!undoStack.length) return;
+  stopClock();
+  let snap; try{ snap=JSON.parse(undoStack.pop()); }catch(e){ return; }
+  T=snap;
+  if(T.ms) T.ms.run=false;            // queda en pausa para que el moderador re-marque tranquilo
+  const tb=document.getElementById('tiebreak'); if(tb) tb.style.display='none';
+  const cb=document.getElementById('contBtn'); if(cb) cb.style.display='block';
+  if(T.ms && !T.ms.done){ renderMatch(); show('s-match'); }
+  else { renderBracket(); show('s-bracket'); }
+  save(); broadcast(true);
+}
 function judge(kind){
   if(!T||!T.ms||T.ms.done) return;
   const s=curSide(); const i=s.ptr;
   if(i<0||!isPend(s.st[i])){ const nx=nextPendingFrom(s,0); if(nx===-1){switchOrEnd();}else{s.ptr=nx;} save(); renderMatch(); return; }
+  pushUndo();                          // guarda el estado ANTES de marcar, para poder deshacer
   if(kind==='ok'){
     s.st[i]=1;                       // verde: sigue el mismo equipo, el reloj no se toca
     const nx=nextPendingFrom(s,i+1);
@@ -1501,6 +1522,7 @@ function renderMatch(){
   }
   renderClocks();
   renderTimeBtn();
+  const ub=document.getElementById('undoBtn'); if(ub) ub.disabled=!undoStack.length;
 }
 function renderClocks(){
   if(!T||!T.ms) return;
