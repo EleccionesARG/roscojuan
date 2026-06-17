@@ -1569,12 +1569,13 @@ function renderSpec(d){
 }
 
 /* ---------- ejemplo / demo (no toca el banco ni el torneo) ---------- */
+/* OJO: estas palabras NO están en el banco a propósito, para no spoilear el torneo */
 const DEMO_W=[
-  {l:'A',ans:'ASADO',clue:'Carne a las brasas, el rey del domingo'},
-  {l:'B',ans:'BARCO',clue:'Embarcación grande que cruza el mar'},
-  {l:'C',ans:'CANCHA',clue:'Donde se juega al fútbol'},
-  {l:'D',ans:'DULCE',clue:'El de leche es el más argentino de todos'},
-  {l:'E',ans:'EMPANADA',clue:'Tapa rellena al horno; salteña o tucumana'},
+  {l:'A',ans:'AVIÓN',clue:'Vuela por el cielo y despega del aeropuerto'},
+  {l:'B',ans:'BANANA',clue:'Fruta amarilla y curva que se pela'},
+  {l:'C',ans:'CASA',clue:'El lugar donde vivís'},
+  {l:'D',ans:'DEDO',clue:'Tenés cinco en cada mano'},
+  {l:'E',ans:'ELEFANTE',clue:'El animal de tierra más grande, con trompa'},
 ];
 let DEMO=null;
 function demoPend(x){return x===0||x===3;}
