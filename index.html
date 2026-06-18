@@ -263,6 +263,7 @@
   <section id="s-matchend" class="screen">
     <div class="brand"><div class="kick" id="meLabel">Resultado</div><h1 style="font-size:clamp(28px,8vw,46px)" id="meTitle">—</h1></div>
     <div id="meRows" style="margin-top:8px"></div>
+    <div id="meRoscos" style="margin-top:6px"></div>
     <div id="tiebreak" style="display:none">
       <div class="cluecard" style="margin-top:6px">
         <div class="top">
@@ -358,7 +359,7 @@ const ROSCOS=[
  {m:'C',ans:'CAÑO',clue:'Jugada futbolera: pasar la pelota entre las piernas del rival',d:1},
  {m:'E',ans:'OBELISCO',clue:'Monumento porteño inaugurado en 1936',d:1},
  {m:'E',ans:'PAMPA',clue:'Llanura extensa del centro del país',d:1},
- {m:'E',ans:'QUEBRACHO',clue:'Árbol de madera durísima; su nombre viene de quebrar el hacha',d:3},
+ {m:'E',ans:'QUEBRACHO',clue:'Árbol de madera tan dura que dicen que rompe el hacha',d:3},
  {m:'E',ans:'RAYUELA',clue:'Novela de Cortázar y también juego infantil de saltar casilleros',d:2},
  {m:'E',ans:'SÁNGUCHE',clue:'El de miga es infaltable en los cumpleaños',d:1},
  {m:'E',ans:'TANGO',clue:'Baile rioplatense declarado patrimonio de la humanidad',d:1},
@@ -425,7 +426,7 @@ const ROSCOS=[
 {name:'Semifinal 2 · Rosco dorado',w:[
  {m:'E',ans:'AVENIDA',clue:'La 9 de Julio es la más ancha del mundo',d:1},
  {m:'E',ans:'BOMBACHA',clue:'Pantalón amplio que usa el gaucho; la de campo',d:1},
- {m:'E',ans:'CHORIPÁN',clue:'Sánguche de chorizo, clásico de cancha y costanera',d:1},
+ {m:'E',ans:'CHORIPÁN',clue:'Sánguche con embutido a la parrilla, clásico de cancha y costanera',d:1},
  {m:'E',ans:'DOMINÓ',clue:'Juego de mesa con fichas blancas y puntos negros',d:1},
  {m:'E',ans:'ESTADIO',clue:'El Monumental es el más grande del país',d:1},
  {m:'E',ans:'FRONTERA',clue:'Límite que separa dos países',d:1},
@@ -668,7 +669,7 @@ const ROSCOS=[
 {name:'Rosco 13',w:[
  {m:'E',ans:'ASADOR',clue:'El responsable de que la carne salga a punto',d:1},
  {m:'E',ans:'BIZCOCHITOS',clue:'Los de grasa acompañan el mate',d:2},
- {m:'E',ans:'CABALGATA',clue:'Paseo largo a caballo',d:2},
+ {m:'E',ans:'CABALGATA',clue:'Paseo largo montando, en grupo por el campo',d:2},
  {m:'E',ans:'DURAZNO',clue:'Fruta de carozo del verano',d:1},
  {m:'E',ans:'ESPUELA',clue:'Va en la bota del gaucho y apura al caballo',d:2},
  {m:'E',ans:'FLAN',clue:'Postre que se pide mixto: con dulce y crema',d:1},
@@ -749,7 +750,7 @@ const ROSCOS=[
 {name:'Rosco 16',w:[
  {m:'E',ans:'ARQUERO',clue:'El único jugador que puede usar las manos',d:1},
  {m:'E',ans:'BOTELLA',clue:'Envase de vidrio del vino y la cerveza',d:1},
- {m:'E',ans:'CAMPANA',clue:'Suena en el campanario; también barrio porteño con puerto',d:2},
+ {m:'E',ans:'CAMPANA',clue:'Suena en la torre de la iglesia; también ciudad bonaerense a orillas del Paraná',d:2},
  {m:'E',ans:'DELFÍN',clue:'Mamífero marino inteligente que salta en el mar',d:1},
  {m:'E',ans:'ESPEJO',clue:'Te devuelve tu imagen',d:1},
  {m:'E',ans:'FRUTILLA',clue:'Fruta roja; la del postre va con crema',d:1},
@@ -835,10 +836,10 @@ const ROSCOS=[
  {m:'E',ans:'ESTRELLA',clue:'Brilla en el cielo de noche; el sol es una',d:1},
  {m:'E',ans:'FUENTE',clue:'Tira agua en la plaza; también bandeja para servir',d:1},
  {m:'E',ans:'GUISO',clue:'Comida de olla que salva el invierno',d:1},
- {m:'E',ans:'HELICÓPTERO',clue:'Vuela con hélices y aterriza en cualquier lado',d:1},
+ {m:'E',ans:'HELICÓPTERO',clue:'Aeronave que despega en vertical y aterriza en cualquier lado',d:1},
  {m:'E',ans:'IMPRESORA',clue:'Saca en papel lo que tenés en la pantalla',d:1},
  {m:'E',ans:'JIRAFA',clue:'El animal más alto, de cuello larguísimo',d:1},
- {m:'E',ans:'LLAVERO',clue:'Argolla donde juntás todas las llaves',d:1},
+ {m:'E',ans:'LLAVERO',clue:'Argolla o cadenita donde colgás las del auto y la casa',d:1},
  {m:'E',ans:'MADRINA',clue:'Te acompaña en el bautismo junto al padrino',d:2},
  {m:'E',ans:'NUEZ',clue:'Fruto seco de cáscara dura que se rompe en Navidad',d:1},
  {m:'C',ans:'MONTAÑA',clue:'Elevación grande de terreno, como las de los Andes',d:1},
@@ -871,7 +872,7 @@ const ROSCOS=[
  {m:'C',ans:'PUÑO',clue:'Mano cerrada',d:1},
  {m:'E',ans:'OREJA',clue:'Con ella escuchás',d:1},
  {m:'E',ans:'PRIMAVERA',clue:'Estación de las flores; arranca el 21 de septiembre',d:1},
- {m:'E',ans:'QUINCENA',clue:'Quince días; también el pago de mitad de mes',d:2},
+ {m:'E',ans:'QUINCENA',clue:'Período de dos semanas; también el pago de mitad de mes',d:2},
  {m:'E',ans:'RÍO',clue:'El de la Plata es el más ancho del mundo',d:1},
  {m:'E',ans:'SOMBRERO',clue:'Se usa en la cabeza; el gaucho no sale sin el suyo',d:1},
  {m:'E',ans:'TALADRO',clue:'Herramienta eléctrica para hacer agujeros',d:2},
@@ -951,13 +952,13 @@ const ROSCOS=[
  {m:'E',ans:'NUCA',clue:'Parte de atrás del cuello',d:1},
  {m:'C',ans:'ESTAÑO',clue:'Metal con el que se sueldan los circuitos',d:3},
  {m:'E',ans:'OMBLIGO',clue:'Marca que te queda en la panza de nacimiento',d:1},
- {m:'E',ans:'PAN',clue:'Sale del horno de la panadería; nuestro de cada día',d:1},
- {m:'E',ans:'QUINTERO',clue:'El que trabaja la quinta de verduras',d:3},
+ {m:'E',ans:'PAN',clue:'Sale del horno y se corta en rodajas; nuestro de cada día',d:1},
+ {m:'E',ans:'QUINTERO',clue:'El que cultiva la huerta de verduras para vender',d:3},
  {m:'E',ans:'RAQUETA',clue:'Con ella se juega al tenis',d:1},
  {m:'E',ans:'SUEGRA',clue:'La mamá de tu pareja',d:1},
  {m:'E',ans:'TOALLA',clue:'Te secás con ella al salir de la ducha',d:1},
  {m:'E',ans:'URRACA',clue:'Ave bulliciosa de plumaje blanco y negro',d:2},
- {m:'E',ans:'VERDULERÍA',clue:'Negocio de frutas y verduras del barrio',d:1},
+ {m:'E',ans:'VERDULERÍA',clue:'Negocio del barrio donde comprás tomate, lechuga y papa',d:1},
  {m:'C',ans:'EXPRIMIDOR',clue:'Aparato para sacarle el jugo a la naranja',d:1},
  {m:'E',ans:'YESQUERO',clue:'Encendedor de bolsillo',d:1},
  {m:'E',ans:'ZANCOS',clue:'Palos altos sobre los que caminan los artistas de circo',d:2},
@@ -1002,7 +1003,7 @@ const ROSCOS=[
  {m:'E',ans:'JOROBA',clue:'La carga el camello en el lomo',d:2},
  {m:'E',ans:'LECHUGA',clue:'Hoja verde básica de la ensalada',d:1},
  {m:'E',ans:'MOLLEJA',clue:'Achura fina y codiciada de la parrilla',d:2},
- {m:'E',ans:'NOTICIA',clue:'Lo que cuentan los diarios y noticieros',d:1},
+ {m:'E',ans:'NOTICIA',clue:'Cada novedad que cuentan los diarios y la tele',d:1},
  {m:'C',ans:'VIÑEDO',clue:'Plantación de vides de Mendoza',d:2},
  {m:'E',ans:'ÓLEO',clue:'Pintura espesa de los cuadros clásicos',d:3},
  {m:'E',ans:'PAREDÓN',clue:'Muro alto y ciego; también frontón para pelotear',d:2},
@@ -1038,7 +1039,7 @@ const ROSCOS=[
  {m:'E',ans:'SERPENTINA',clue:'Rollo de papel que se arroja en el carnaval',d:2},
  {m:'E',ans:'TROMPO',clue:'Juguete de madera que gira con un piolín',d:1},
  {m:'E',ans:'UJIER',clue:'Empleado que custodia las puertas en tribunales y congresos',d:3},
- {m:'E',ans:'VENDAJE',clue:'Vendas que envuelven una lastimadura',d:2},
+ {m:'E',ans:'VENDAJE',clue:'Lo que el enfermero enrolla sobre una herida',d:2},
  {m:'C',ans:'BÓXER',clue:'Perro de cara chata; también calzoncillo',d:1},
  {m:'E',ans:'YODO',clue:'Antiséptico que pinta de marrón las lastimaduras',d:1},
  {m:'E',ans:'ZAMPOÑA',clue:'Flauta andina de varios tubos',d:3},
@@ -1449,8 +1450,23 @@ function renderMatchEnd(A,B,w){
   document.getElementById('meTitle').textContent= w!=null ? ('Ganó '+T.teams[sides[w].t]) : 'Empate total';
   const row=(s,sc,win)=>`<div class="res-row ${win?'win':''}"><span class="nm">${esc(T.teams[s.t])}</span><span class="nums" style="color:var(--good)">✔ ${sc.g}</span><span class="nums" style="color:var(--bad)">✖ ${sc.b}</span><span class="nums">⏱ ${sc.t}s</span></div>`;
   document.getElementById('meRows').innerHTML=row(sides[0],A,w===0)+row(sides[1],B,w===1);
+  const leyenda=`<div style="font-size:12px;color:var(--muted-l);margin:12px 0 2px">Cómo le fue a cada equipo · <span style="color:var(--good)">✔ acertó</span> · <span style="color:var(--bad)">✖ erró</span> · <span style="color:var(--sun)">⟳ pasó</span> · sin jugar</div>`;
+  document.getElementById('meRoscos').innerHTML=leyenda+roscoSummary(sides[0])+roscoSummary(sides[1]);
   document.getElementById('tbA').textContent='Ganó '+T.teams[sides[0].t];
   document.getElementById('tbB').textContent='Ganó '+T.teams[sides[1].t];
+}
+function roscoSummary(s){
+  let h=`<div style="font-weight:800;font-size:14px;margin:12px 0 6px">${esc(T.teams[s.t])}</div><div style="display:flex;flex-wrap:wrap;gap:5px">`;
+  for(let i=0;i<LETTERS.length;i++){
+    const st=s.st[i], ans=BANCO[i][s.w[i]].ans;
+    let bg,fg;
+    if(st===1){bg='var(--good)';fg='#fff';}
+    else if(st===2){bg='var(--bad)';fg='#fff';}
+    else if(st===3){bg='var(--sun)';fg='var(--navy)';}
+    else {bg='#1c3f63';fg='var(--muted-l)';}
+    h+=`<span style="background:${bg};color:${fg};border-radius:8px;padding:3px 8px;font-size:12px;font-weight:700;white-space:nowrap"><b>${LETTERS[i]}</b> ${esc(ans)}</span>`;
+  }
+  return h+'</div>';
 }
 function renderTiebreak(){
   const w=DESEMPATE[T.nextDes%DESEMPATE.length];
@@ -1545,9 +1561,9 @@ function broadcast(force){
     payload.label=roundLabel(ms.r);
     payload.a=ms.a; payload.run=ms.run; payload.done=ms.done;
     payload.sides=ms.sides.map(x=>({name:T.teams[x.t],st:x.st.join(''),ptr:x.ptr,time:Math.ceil(Math.max(0,x.time))}));
-    if(!ms.done && s.ptr>=0 && isPend(s.st[s.ptr])){
+    if(!ms.done && ms.run && s.ptr>=0 && isPend(s.st[s.ptr])){
       const w=BANCO[s.ptr][s.w[s.ptr]];
-      payload.clue={l:LETTERS[s.ptr],m:w.m,text:w.clue}; // sin la respuesta
+      payload.clue={l:LETTERS[s.ptr],m:w.m,text:w.clue}; // pista al público SOLO con el reloj corriendo; sin la respuesta
     }
     if(ms.done&&ms.winner!=null) payload.winnerName=T.teams[ms.sides[ms.winner].t];
   } else if(T.champion!=null){ payload.label='Torneo terminado'; payload.winnerName=T.teams[T.champion]; }
@@ -1578,7 +1594,7 @@ function renderSpec(d){
   const clue=document.getElementById('spClue');
   if(d.winnerName){ clue.innerHTML=`<b>🏆 Ganó ${esc(d.winnerName)}</b>`; }
   else if(d.clue){ clue.innerHTML=`<span class="cmode">${d.clue.m==='E'?'Empieza con ':'Contiene la '}${esc(d.clue.l)}</span><div class="ctext">${esc(d.clue.text)}</div>`; }
-  else clue.textContent= d.sides?'Partido en pausa…':'Esperando que arranque el partido…';
+  else clue.textContent= d.sides?'⏸ Esperando que arranque el tiempo…':'Esperando que arranque el partido…';
   const g=document.getElementById('spGrid');
   if(!d.sides){ g.innerHTML=''; return; }
   g.innerHTML=d.sides.map((s,i)=>{
