@@ -122,6 +122,14 @@
   .rule .dot{display:inline-block;width:22px;text-align:center;font-weight:800;margin-right:2px}
   .rule .dot.good{color:var(--good)} .rule .dot.bad{color:var(--bad)} .rule .dot.pass{color:var(--celeste-deep)}
   #s-rules .card{max-height:none}
+  .rev-list{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+  .rev-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+  .rev-row:first-child{border-top:0}
+  .rev-l{font-family:'Anton',sans-serif;font-size:18px;color:var(--celeste-deep);width:20px;flex:0 0 auto;text-align:center}
+  .rev-mk{font-weight:800;width:18px;flex:0 0 auto;text-align:center}
+  .rev-w{font-size:13.5px;line-height:1.3;display:flex;flex-direction:column}
+  .rev-w b{color:var(--navy);letter-spacing:.02em}
+  .rev-c{color:var(--muted);font-size:12.5px}
   body.stage-mode .footer-note{color:var(--muted-l)}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -291,10 +299,12 @@
     <div class="brand"><div class="kick">Dos jugadores · sin moderador</div><h1 style="font-size:clamp(28px,8vw,46px)">Duelo de a dos</h1></div>
     <div class="card" style="text-align:left">
       <p class="rule">Cada uno con su celular. En <b>tu turno</b> ves la pista (sin la respuesta) y corre tu reloj; cantás en voz alta. El <b>otro teléfono</b> ve tu respuesta y te marca ✔ / ⟳ / ✖. Cuando le toca al rival, se invierten los roles.</p>
+      <p class="rule" id="d2bankInfo" style="color:var(--muted);font-size:13px;margin-bottom:0"></p>
     </div>
     <div class="stack">
       <button class="btn btn-sun" onclick="d2Create()">Crear duelo</button>
       <button class="btn btn-ghost" onclick="show('s-d2join')">Unirme con un PIN</button>
+      <button class="btn btn-ghost" onclick="d2ConfirmReset()">♻ Reiniciar palabras usadas</button>
       <button class="btn btn-ghost" onclick="show('s-home')">Volver</button>
     </div>
   </section>
@@ -381,7 +391,11 @@
       <div class="champ" id="d2endWinner">—</div>
     </div>
     <div id="d2endRows" style="margin-top:8px"></div>
-    <div class="stack"><button class="btn btn-ghost" onclick="d2Quit()">Volver al inicio</button></div>
+    <div id="d2reviewWrap" style="margin-top:6px"></div>
+    <div class="stack">
+      <button class="btn btn-ghost" onclick="d2ToggleReview()">📖 Ver las palabras que salieron</button>
+      <button class="btn btn-ghost" onclick="d2Quit()">Volver al inicio</button>
+    </div>
   </section>
 
 </div>
@@ -1865,7 +1879,22 @@ function renderSpec(d){
    ===================================================================== */
 let d2ref=null, d2me=0, d2pin=null, d2clockIv=null, d2last=0, d2timePer=150;
 function d2clean(){ if(d2clockIv){clearInterval(d2clockIv);d2clockIv=null;} if(d2ref){d2ref.off();d2ref=null;} }
-function d2Home(){ if(!fbReady){ alert('El duelo de a dos necesita Firebase, que ya está configurado en este archivo. Si estás viéndolo sin conexión, no va a funcionar.'); return; } d2clean(); renderD2Time(); show('s-d2home'); }
+function d2Home(){ if(!fbReady){ alert('El duelo de a dos necesita Firebase, que ya está configurado en este archivo. Si estás viéndolo sin conexión, no va a funcionar.'); return; } d2clean(); renderD2Time(); d2RenderBankInfo(); show('s-d2home'); }
+function d2RenderBankInfo(){
+  const el=document.getElementById('d2bankInfo'); if(!el) return;
+  const hist=d2LoadHist();
+  const usadas=hist.reduce((a,l)=>a+l.length,0);
+  const total=BANCO.length*BANCO[0].length; // 1000
+  const dispPorLetra=Math.min(...LETTERS.map((_,i)=>BANCO[i].length-hist[i].length));
+  el.textContent = usadas===0
+    ? 'Banco completo: 1000 palabras sin usar.'
+    : `Ya usaste ${usadas} palabras en duelos anteriores. Quedan al menos ${dispPorLetra} por letra sin repetir. Si se agota alguna, se recicla sola.`;
+}
+function d2ConfirmReset(){
+  if(confirm('¿Reiniciar el registro de palabras usadas? En los próximos duelos van a poder volver a salir todas.')){
+    d2ResetHist(); d2RenderBankInfo();
+  }
+}
 function renderD2Time(){
   const el=document.getElementById('d2timeOpts'); if(!el)return;
   el.innerHTML=[120,150,180].map(n=>`<button class="chip ${d2timePer===n?'active':''}" onclick="d2timePer=${n};renderD2Time();d2PushCfg()">${n} s</button>`).join('');
@@ -1928,23 +1957,37 @@ function d2Lobby(d){
 function d2Start(){
   // sólo el anfitrión sortea, para que ambos roscos salgan iguales
   const pair=drawDuelStandalone();
-  d2ref.update({ status:'play', run:false, active:0, done:false, winner:null,
+  d2ref.update({ status:'play', run:false, active:0, done:false, winner:null, undo:null,
     st:[Array(LETTERS.length).fill(0),Array(LETTERS.length).fill(0)],
     ptr:[0,0], time:[d2timePer,d2timePer], w:pair, ts:Date.now() });
 }
-/* sorteo en espejo autónomo (no depende de T) */
+/* historial de palabras ya usadas en duelos anteriores (por letra, guardado en este teléfono) */
+const D2HIST='rosco2_hist';
+function d2LoadHist(){ try{ const v=JSON.parse(localStorage.getItem(D2HIST)||'null'); if(v&&v.length===LETTERS.length) return v; }catch(e){} return LETTERS.map(()=>[]); }
+function d2SaveHist(hist){ try{ localStorage.setItem(D2HIST,JSON.stringify(hist)); }catch(e){} }
+function d2ResetHist(){ d2SaveHist(LETTERS.map(()=>[])); }
+/* sorteo en espejo autónomo, evitando lo ya usado (historial) y reciclando si se agota */
 function drawDuelStandalone(){
-  const used=LETTERS.map(()=>[]); const quota={1:12,2:9,3:4};
+  const hist=d2LoadHist();
+  const quota={1:12,2:9,3:4};
   const wa=Array(LETTERS.length), wb=Array(LETTERS.length);
   const order=LETTERS.map((_,i)=>i); for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
   order.forEach(i=>{
-    const avail={1:[],2:[],3:[]}; BANCO[i].forEach((w,k)=>{ if(!used[i].includes(k)) avail[w.d||2].push(k); });
-    let tiers=[1,2,3].filter(t=>quota[t]>0&&avail[t].length>=2); if(!tiers.length) tiers=[1,2,3].filter(t=>avail[t].length>=2);
+    let avail={1:[],2:[],3:[]}; BANCO[i].forEach((w,k)=>{ if(!hist[i].includes(k)) avail[w.d||2].push(k); });
+    // necesito al menos 2 palabras libres en esta letra; si no, reinicio el historial de la letra
+    if(avail[1].length+avail[2].length+avail[3].length < 2){ hist[i]=[]; avail={1:[],2:[],3:[]}; BANCO[i].forEach((w,k)=>avail[w.d||2].push(k)); }
+    let tiers=[1,2,3].filter(t=>quota[t]>0&&avail[t].length>=2); // niveles con cupo y ≥2 palabras
+    if(!tiers.length) tiers=[1,2,3].filter(t=>avail[t].length>=2); // sin mirar cupo, con ≥2
+    if(!tiers.length){ // ningún nivel tiene 2: reinicio la letra entera y reevalúo
+      hist[i]=[]; avail={1:[],2:[],3:[]}; BANCO[i].forEach((w,k)=>avail[w.d||2].push(k));
+      tiers=[1,2,3].filter(t=>avail[t].length>=2);
+    }
     const pool=[]; tiers.forEach(t=>{ for(let r=0;r<Math.max(1,quota[t]);r++) pool.push(t); });
     const t=pool[Math.floor(Math.random()*pool.length)]; const list=avail[t];
     const p1=Math.floor(Math.random()*list.length); let p2=Math.floor(Math.random()*(list.length-1)); if(p2>=p1)p2++;
-    if(quota[t]>0) quota[t]--; used[i].push(list[p1],list[p2]); wa[i]=list[p1]; wb[i]=list[p2];
+    if(quota[t]>0) quota[t]--; hist[i].push(list[p1],list[p2]); wa[i]=list[p1]; wb[i]=list[p2];
   });
+  d2SaveHist(hist); // registro lo usado para los próximos duelos
   return [wa,wb];
 }
 function d2Play(d){
@@ -2076,7 +2119,37 @@ function d2End(d){
   const row=(i,s,win)=>`<div class="res-row ${win?'win':''}"><span class="nm">${esc(d.names[i]||('Jugador '+(i+1)))}</span><span class="nums" style="color:var(--good)">✔ ${s.g}</span><span class="nums" style="color:var(--bad)">✖ ${s.b}</span><span class="nums">⏱ ${s.t}s</span></div>`;
   document.getElementById('d2endRows').innerHTML=row(0,A,w===0)+row(1,B,w===1)
     +(w===-1?'<p class="hint" style="text-align:center;margin-top:8px">Empate total: desempaten con una palabra a viva voz.</p>':'');
+  d2lastGame=d; // guardo para el repaso
+  document.getElementById('d2reviewWrap').innerHTML='';
   show('s-d2end');
+}
+let d2lastGame=null, d2reviewOpen=false;
+function d2ToggleReview(){
+  const wrap=document.getElementById('d2reviewWrap');
+  d2reviewOpen=!d2reviewOpen;
+  if(!d2reviewOpen || !d2lastGame){ wrap.innerHTML=''; return; }
+  const d=d2lastGame;
+  const mark={0:'·',1:'✔',2:'✖',3:'⟳'}; const col={0:'var(--muted)',1:'var(--good)',2:'var(--bad)',3:'var(--sun-deep)'};
+  let html='';
+  [0,1].forEach(pi=>{
+    const nm=esc(d.names[pi]||('Jugador '+(pi+1)));
+    html+=`<div class="card" style="text-align:left;margin-bottom:12px;padding:14px 16px">
+      <div class="section-title" style="font-size:18px">Rosco de ${nm}</div>
+      <div class="rev-list">`;
+    LETTERS.forEach((L,i)=>{
+      const wIdx=d.w&&d.w[pi]?d.w[pi][i]:null;
+      if(wIdx==null) return;
+      const w=BANCO[i][wIdx]; const stt=d.st[pi][i];
+      html+=`<div class="rev-row">
+        <span class="rev-l">${L}</span>
+        <span class="rev-mk" style="color:${col[stt]}">${mark[stt]}</span>
+        <span class="rev-w"><b>${esc(w.ans)}</b><span class="rev-c">${esc(w.clue)}</span></span>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  wrap.innerHTML=html;
+  wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function d2Quit(){
   if(d2ref && d2me===0){ d2ref.remove(); } // el anfitrión cierra la sala
