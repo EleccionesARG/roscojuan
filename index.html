@@ -366,6 +366,7 @@
           <button class="judge j-pass" onclick="d2Judge('pass')">⟳ Pasa</button>
           <button class="judge j-bad" onclick="d2Judge('bad')">✖ Error</button>
         </div>
+        <div class="matchctl"><button class="btn btn-ghost" id="d2undoBtn" onclick="d2Undo()" style="display:none">↩ Deshacer última</button></div>
       </div>
       <p class="hint" style="text-align:center;margin-top:10px" id="d2judgeHint">Escuchá y marcá lo que cantó el rival.</p>
     </div>
@@ -1981,6 +1982,8 @@ function d2Play(d){
       document.getElementById('d2jAns').textContent=word.ans;
     }
     document.getElementById('d2judgeHint').textContent = d.run ? 'Escuchá y marcá lo que cantó el rival.' : 'Esperando que el rival arranque su tiempo…';
+    const ub=document.getElementById('d2undoBtn');
+    if(ub) ub.style.display = d.undo ? 'block' : 'none';
   }
   show('s-d2play');
 }
@@ -2015,13 +2018,15 @@ function d2Judge(kind){
     if(d.active===d2me) return; // el activo no juzga
     const a=d.active; const st=d.st[a].slice(); const i=d.ptr[a];
     if(i<0||!(st[i]===0||st[i]===3)) return;
+    // snapshot para deshacer: guardo el estado ANTES de aplicar
+    const snap={st:[d.st[0].slice(),d.st[1].slice()],ptr:d.ptr.slice(),active:d.active,run:d.run,time:d.time.slice()};
     const nextFrom=(from)=>{ for(let k=0;k<LETTERS.length;k++){const j=((from%LETTERS.length)+LETTERS.length+k)%LETTERS.length; if(st[j]===0||st[j]===3) return j;} return -1; };
     let newPtr, newActive=a, stopRun=false, aliveOther=(d.time[1-a]>0 && d.st[1-a].some(x=>x===0||x===3));
     if(kind==='ok'){
       st[i]=1; newPtr=nextFrom(i+1);
       if(newPtr===-1){ // completó su rosco
         if(aliveOther){ newActive=1-a; stopRun=true; }
-        else { d2applyAndMaybeEnd(d,st,i===-1?0:newPtr,a,newActive,true); return; }
+        else { d2applyAndMaybeEnd(d,st,i===-1?0:newPtr,a,newActive,true,snap); return; }
       }
     } else if(kind==='bad'){
       st[i]=2; newPtr=nextFrom(i+1);
@@ -2031,7 +2036,7 @@ function d2Judge(kind){
       if(aliveOther){ newActive=1-a; } stopRun=true;
     }
     const upd={}; upd['st/'+a]=st; upd['ptr/'+a]=(newPtr===-1?i:newPtr); upd['active']=newActive;
-    if(stopRun) upd['run']=false; upd['ts']=Date.now();
+    if(stopRun) upd['run']=false; upd['ts']=Date.now(); upd['undo']=snap;
     // ¿terminó todo?
     const meDone=!st.some(x=>x===0||x===3);
     const otherDone=!d.st[1-a].some(x=>x===0||x===3) || d.time[1-a]<=0;
@@ -2039,8 +2044,17 @@ function d2Judge(kind){
     d2ref.update(upd);
   });
 }
-function d2applyAndMaybeEnd(d,st,ptr,a,newActive,end){
+/* deshace la última marca (lo puede tocar el que está juzgando) */
+function d2Undo(){
+  d2ref.once('value',ss=>{
+    const d=ss.val(); if(!d||d.done||d.status!=='play'||!d.undo) return;
+    const u=d.undo;
+    d2ref.update({ st:u.st, ptr:u.ptr, active:u.active, run:false, time:u.time, undo:null, ts:Date.now() });
+  });
+}
+function d2applyAndMaybeEnd(d,st,ptr,a,newActive,end,snap){
   const upd={}; upd['st/'+a]=st; upd['ptr/'+a]=ptr; upd['active']=newActive; upd['run']=false; upd['ts']=Date.now();
+  if(snap) upd['undo']=snap;
   d2ref.update(upd); if(end) d2finish();
 }
 function d2finish(){
